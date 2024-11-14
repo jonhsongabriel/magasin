@@ -1,9 +1,8 @@
 // src/App.js
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
-
-import Accueil from './Accueil'
 import React from 'react';
+
+import Accueil from './Accueil';
 import Header from './componement/Header';
 import Footer from './componement/Footer';
 import Connection from './Membre/Connection';
@@ -15,7 +14,7 @@ import Apropos from './pages/Apropos';
 import Construction from './pages/Contsruction';
 import Exportation from './pages/Fianarantsoa';
 import Fianarantsoa from './pages/Antananarivo';
-import Grossite from './pages/Grossiste';
+import Grossiste from './pages/Grossiste';
 import Impotation from './pages/Importation';
 import Magasin from './pages/Magasin';
 import Mahajanga from './pages/Mahajanga';
@@ -32,33 +31,36 @@ function App() {
   return (
     <div>
       <Router>
-      <Header />
-         <Routes>
-             <Route path="/" element={<Accueil />}/>
-             <Route path="/Membre" element={<Connection />}/>
-             <Route path="/Membre" element={<Inscription />}/>
-             <Route path="/pages" element={<Aliment/>}/>
-             <Route path="/pages" element={<Antananarivo />}/>
-             <Route path="/pages" element={<Antsiranana />}/>
-             <Route path="/pages" element={<Apropos />}/>
-             <Route path="/pages" element={<Construction />}/>
-             <Route path="/pages" element={<Exportation />}/>
-             <Route path="/pages" element={<Fianarantsoa />}/>
-             <Route path="/pages" element={<Grossite />}/>
-             <Route path="/pages" element={<Impotation />}/>
-             <Route path="/pages" element={<Magasin />}/>
-             <Route path="/pages" element={<Mahajanga />}/>
-             <Route path="/pages" element={<Mecanique />}/>
-             <Route path="/pages" element={<Medicale />}/>
-             <Route path="/pages" element={<Mode />}/>
-             <Route path="/pages" element={<Personnel />}/>
-             <Route path="/pages" element={<Shop />}/>
-             <Route path="/pages" element={<Tamatave />}/>
-             <Route path="/pages" element={<Tech />}/>
-             <Route path="/pages" element={<Toliara />}/>
-         </Routes>
-         </Router> 
-      <Footer />
+        <Header />
+        <Routes>
+          {/* Routes principales */}
+          <Route path="/" element={<Accueil />} />
+          <Route path="/Membre/Connection" element={<Connection />} />
+          <Route path="/Membre/Inscription" element={<Inscription />} />
+
+          {/* Pages supplémentaires */}
+          <Route path="/pages/aliment" element={<Aliment />} />
+          <Route path="/pages/antananarivo" element={<Antananarivo />} />
+          <Route path="/pages/antsiranana" element={<Antsiranana />} />
+          <Route path="/pages/apropos" element={<Apropos />} />
+          <Route path="/pages/construction" element={<Construction />} />
+          <Route path="/pages/exportation" element={<Exportation />} />
+          <Route path="/pages/fianarantsoa" element={<Fianarantsoa />} />
+          <Route path="/pages/grossiste" element={<Grossiste />} />
+          <Route path="/pages/importation" element={<Impotation />} />
+          <Route path="/pages/magasin" element={<Magasin />} />
+          <Route path="/pages/mahajanga" element={<Mahajanga />} />
+          <Route path="/pages/mecanique" element={<Mecanique />} />
+          <Route path="/pages/medicale" element={<Medicale />} />
+          <Route path="/pages/mode" element={<Mode />} />
+          <Route path="/pages/personnel" element={<Personnel />} />
+          <Route path="/pages/shop" element={<Shop />} />
+          <Route path="/pages/tamatave" element={<Tamatave />} />
+          <Route path="/pages/tech" element={<Tech />} />
+          <Route path="/pages/toliara" element={<Toliara />} />
+        </Routes>
+        <Footer />
+      </Router>
     </div>
   );
 }

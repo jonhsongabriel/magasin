@@ -14,19 +14,19 @@ const Header = () => {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0 row">
             <li className="nav-item col-md">
-              <Link className="nav-Link text-white active" aria-current="page" to="/Apropos">A propos </Link>
+              <Link className="nav-Link text-white active" aria-current="page" to="pages/Apropos">A propos </Link>
             </li>
             <li className="nav-item dropdown col-md">
               <a className="nav-Link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Produit
               </a>
               <ul className="dropdown-menu  bg-primary dropdown-item-custom">
-                <li><Link className="dropdown-item text-white " to="/Tech">Produit technologique</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Aliment">Produit alimentaire</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Contsruction">Produit de construction</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Mode">Produit de mode</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Mecanique">Produit mecanique</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Medicale">Produit de medicale</Link></li>
+                <li><Link className="dropdown-item text-white " to="pages/Tech">Produit technologique</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Aliment">Produit alimentaire</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Contsruction">Produit de construction</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Mode">Produit de mode</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Mecanique">Produit mecanique</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Medicale">Produit de medicale</Link></li>
               </ul>
             </li>
             <li className="nav-item dropdown col-md">
@@ -34,12 +34,12 @@ const Header = () => {
                 Contact
               </a>
               <ul className="dropdown-menu  bg-primary">
-                <li><Link className="dropdown-item text-white" to="/Antananarivo">Antananarivo</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Fianarantsoa">Fianarantsoa</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Antsiranana">Antsiranana</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Mahajanga">Mahajanga</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Toliara">Toliara</Link></li>
-                <li><Link className="dropdown-item text-white" to="Tamatave">Tamatavy</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Antananarivo">Antananarivo</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Fianarantsoa">Fianarantsoa</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Antsiranana">Antsiranana</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Mahajanga">Mahajanga</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Toliara">Toliara</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Tamatave">Tamatavy</Link></li>
               </ul>
             </li>
             <li className="nav-item dropdown col-md">
@@ -47,19 +47,19 @@ const Header = () => {
                 Partenaire
               </a>
               <ul className="dropdown-menu  bg-primary">
-                <li><Link className="dropdown-item text-white" to="/Shop">Shop</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Grossiste">Grossite</Link></li>
-                <li><Link className="dropdown-item text-white" to="Magasin">Magasin</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Personnel">Personnelle</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Importation">Imporatateur</Link></li>
-                <li><Link className="dropdown-item text-white" to="/Exportation">Exportataire</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Shop">Shop</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Grossiste">Grossite</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Magasin">Magasin</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Personnel">Personnelle</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Importation">Imporatateur</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Exportation">Exportataire</Link></li>
               </ul>
             </li>
             <li className="nav-item col-md">
-              <Link className="nav-Link text-white" to="/Inscription">Inscription</Link>
+              <Link className="nav-Link text-white" to="Membre/Inscription">Inscription</Link>
             </li>
             <li className="nav-item col-md">
-              <Link className="nav-Link text-white" to="/Connection">Connection</Link>
+              <Link className="nav-Link text-white" to="Membre/Connection">Connection</Link>
             </li>
           </ul>
           <form className="d-flex" role="search">
