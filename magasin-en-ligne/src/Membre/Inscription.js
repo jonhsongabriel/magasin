@@ -8,7 +8,9 @@ function Inscription() {
     contact: '',
     activite: '',
     domaine: '',
-    image: null
+    image: null,
+    email:'',
+    password:''
   });
 
   // Mise à jour des champs du formulaire
@@ -20,36 +22,40 @@ function Inscription() {
     });
   };
 
-  // Gestion de la soumission du formulaire
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+// Gestion de la soumission du formulaire
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const formDataToSend = new FormData();
-    formDataToSend.append('nom', formData.nom);
-    formDataToSend.append('prenom', formData.prenom);
-    formDataToSend.append('adresse', formData.adresse);
-    formDataToSend.append('contact', formData.contact);
-    formDataToSend.append('activite', formData.activite);
-    formDataToSend.append('domaine', formData.domaine);
-    formDataToSend.append('image', formData.image);
-    console.log("Données envoyées : ", formDataToSend);
+  const formDataToSend = new FormData();
+  formDataToSend.append('nom', formData.nom);
+  formDataToSend.append('prenom', formData.prenom);
+  formDataToSend.append('adresse', formData.adresse);
+  formDataToSend.append('contact', formData.contact);
+  formDataToSend.append('activite', formData.activite);
+  formDataToSend.append('domaine', formData.domaine);
+  formDataToSend.append('image', formData.image);
+  formDataToSend.append('email', formData.email);
+  formDataToSend.append('password', formData.password);
 
-    try {
-      const response = await fetch('http://localhost:5000/api/inscription', {
-        method: 'POST',
-        body: formDataToSend
-      });
+  console.log("Données envoyées : ", Object.fromEntries(formDataToSend.entries())); // Ajout du log pour vérifier
 
-      if (response.ok) {
-        alert("Inscription réussie");
-      } else {
-        alert("L'inscription n'a pas été effectuée");
-      }
-    } catch (error) {
-      console.error("Erreur:", error);
-      alert("Une erreur est survenue lors de l'inscription");
+  try {
+    const response = await fetch('http://localhost:5000/api/inscription', {
+      method: 'POST',
+      body: formDataToSend
+    });
+
+    if (response.ok) {
+      alert("Inscription réussie");
+    } else {
+      alert("L'inscription n'a pas été effectuée");
     }
-  };
+  } catch (error) {
+    console.error("Erreur:", error);
+    alert("Une erreur est survenue lors de l'inscription");
+  }
+};
+
 
   return (
     <div className='container  p-4 bg-secondary mt-2 mb-2 '>
@@ -88,6 +94,14 @@ function Inscription() {
            <div className="mb-3 mt-3">
               <label for="image" className="form-label text-white">Image:</label>
               <input type="file" className='form-control' name="image" onChange={(e) => setFormData({ ...formData, image: e.target.files[0] })} />
+           </div>
+           <div className="mb-3 mt-3">
+              <label for="email" className="form-label text-white">Email:</label>
+              <input type="text" className='form-control' name="email" placeholder="Email" onChange={handleChange} required />
+           </div>
+           <div className="mb-3 mt-3">
+              <label for="password" className="form-label text-white">Password:</label>
+              <input type="password" className='form-control' name="password" placeholder="Password" onChange={handleChange} required />
            </div>
         
         <div className='text-center'>

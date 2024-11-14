@@ -2,16 +2,17 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const multer = require('multer');  // Importation de Multer
+const bcrypt = require('bcrypt');  // Importation de bcrypt pour le hachage de mot de passe
 const app = express();
 const port = 5000;
 
 // Configuration de Multer pour le stockage des fichiers
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');  // Vous devez vous assurer que le dossier 'uploads' existe
+    cb(null, 'uploads/');  // Assurez-vous que le dossier 'uploads' existe
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);  // Vous pouvez personnaliser le nom du fichier ici
+    cb(null, Date.now() + '-' + file.originalname);  // Nom unique pour chaque fichier
   }
 });
 
@@ -37,29 +38,40 @@ db.connect((err) => {
   }
 });
 
-// Route d'inscription avec gestion des fichiers (image)
 app.post('/api/inscription', upload.single('image'), (req, res) => {
-  // Logs pour vérifier les données reçues
-  console.log('Corps de la requête:', req.body);
-  console.log('Fichier téléchargé:', req.file);
+  const { nom, prenom, adresse, contact, activite, domaine, email, password } = req.body;
+  const imagePath = req.file ? req.file.path : null;
 
-  const { nom, prenom, adresse, contact, activite, domaine } = req.body;
-  if (!nom || !prenom || !adresse || !contact || !activite || !domaine) {
-    return res.status(400).send('Tous les champs doivent être remplis');
-  }
-
-  const image = req.file ? req.file.filename : null;
-
-  const query = 'INSERT INTO utilisateurs (nom, prenom, adresse, contact, activite, domaine, image) VALUES (?, ?, ?, ?, ?, ?, ?)';
-
-  db.query(query, [nom, prenom, adresse, contact, activite, domaine, image], (err, result) => {
+  // Commencer la transaction
+  db.beginTransaction((err) => {  // Remplacer 'connection' par 'db'
     if (err) {
-      console.error('Erreur lors de l\'insertion:', err);
-      return res.status(500).send('Erreur lors de l\'inscription');
-    } else {
-      console.log('Utilisateur ajouté:', result);
-      res.status(200).send('Inscription réussie');
+      return res.status(500).send('Erreur lors de la transaction');
     }
+
+    // Requête d'insertion
+    const query = 'INSERT INTO utilisateurs (nom, prenom, adresse, contact, activite, domaine, image, email, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    db.query(query, [nom, prenom, adresse, contact, activite, domaine, imagePath, email, password], (err, result) => {  // Remplacer 'connection' par 'db'
+      if (err) {
+        // En cas d'erreur, rollback la transaction
+        return db.rollback(() => {  // Remplacer 'connection' par 'db'
+          console.error('Erreur d\'insertion dans la base de données:', err);
+          res.status(500).send('Erreur lors de l\'inscription');
+        });
+      }
+
+      // Si tout est correct, valider la transaction
+      db.commit((err) => {  // Remplacer 'connection' par 'db'
+        if (err) {
+          return db.rollback(() => {  // Remplacer 'connection' par 'db'
+            console.error('Erreur de commit de la transaction:', err);
+            res.status(500).send('Erreur lors de l\'inscription');
+          });
+        }
+
+        console.log('Utilisateur ajouté avec succès');
+        res.status(200).send('Inscription réussie');
+      });
+    });
   });
 });
 
