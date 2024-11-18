@@ -1,13 +1,16 @@
 // src/componement/Header.js
 import React from 'react';
 import { Link } from 'react-router-dom';
+import jonhsonLogo from '../assets/jonhson-logo.jpg';
 
 
 const Header = () => {
   return (
     <nav className="navbar navbar-expand-lg bg-danger text-white">
       <div className="container-fluid">
-        <Link className="navbar-brand" aria-current="page" to="/">Accueil</Link>
+        <Link className="navbar-brand" aria-current="page" to="/">
+            <img src={jonhsonLogo} alt='Jonhson Logo' style={{width:100 ,}} />
+        </Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>

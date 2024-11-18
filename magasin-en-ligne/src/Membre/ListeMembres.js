@@ -34,16 +34,17 @@ function ListeMembres() {
       <h2 className="text-center text-white">Liste des Membres</h2>
       <div className="row">
         {membres.map((membre) => (
-          <div className="col-md-4 mb-4" key={membre._id}>
-            <div className="card">
+          <div className="col-md-4 mb-4 " key={membre._id}>
+            <div className="card bg-white">
               <img
                 src={membre.image || 'https://via.placeholder.com/150'}
                 alt={membre.nom}
                 className="card-img-top"
-                style={{ height: '200px', objectFit: 'cover' }}
+                style={{ height: '16em' }}
               />
               <div className="card-body">
-                <h5 className="card-title">{membre.nom} {membre.prenom}</h5>
+                <h5 className="card-title text-center text-success">{membre.nom} </h5>
+                <h6 className="card-title text-center text-success"> {membre.prenom}</h6>
                 <p className="card-text">
                   <strong>Adresse:</strong> {membre.adresse}
                 </p>
