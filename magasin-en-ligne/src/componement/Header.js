@@ -61,6 +61,9 @@ const Header = () => {
             <li className="nav-item col-md">
               <Link className="nav-Link text-white" to="Membre/Connection">Connection</Link>
             </li>
+            <li className="nav-item col-md">
+              <Link className="nav-Link text-white" to="Membre/ListeMembres">Membres</Link>
+            </li>
           </ul>
           <form className="d-flex" role="search">
             <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />

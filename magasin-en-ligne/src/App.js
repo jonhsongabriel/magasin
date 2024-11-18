@@ -26,6 +26,7 @@ import Shop from './pages/Shop';
 import Tamatave from './pages/Tamatave';
 import Tech from './pages/Tech';
 import Toliara from './pages/Toliara';
+import ListeMembres from './Membre/ListeMembres';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path="/" element={<Accueil />} />
           <Route path="/Membre/Connection" element={<Connection />} />
           <Route path="/Membre/Inscription" element={<Inscription />} />
+          <Route path="/Membre/ListeMembres" element={<ListeMembres />} />
 
           {/* Pages supplémentaires */}
           <Route path="/pages/aliment" element={<Aliment />} />
