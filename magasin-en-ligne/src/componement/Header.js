@@ -23,20 +23,20 @@ const Header = () => {
               <a className="nav-Link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Produit
               </a>
-              <ul className="dropdown-menu  bg-primary dropdown-item-custom">
-                <li><Link className="dropdown-item text-white " to="pages/Tech">Produit technologique</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Aliment">Produit alimentaire</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Contsruction">Produit de construction</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Mode">Produit de mode</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Mecanique">Produit mecanique</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Medicale">Produit de medicale</Link></li>
+              <ul className="dropdown-menu  bg-primary dropdown-item-custom text-center">
+                <li><Link className="dropdown-item text-white " to="pages/Tech">Technologique</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Aliment">Alimentaire</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Construction">Construction</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Mode">Mode</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Mecanique">Mecanique</Link></li>
+                <li><Link className="dropdown-item text-white" to="pages/Medicale">Medicale</Link></li>
               </ul>
             </li>
             <li className="nav-item dropdown col-md">
               <a className="nav-Link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Contact
               </a>
-              <ul className="dropdown-menu  bg-primary">
+              <ul className="dropdown-menu  bg-primary text-center">
                 <li><Link className="dropdown-item text-white" to="pages/Antananarivo">Antananarivo</Link></li>
                 <li><Link className="dropdown-item text-white" to="pages/Fianarantsoa">Fianarantsoa</Link></li>
                 <li><Link className="dropdown-item text-white" to="pages/Antsiranana">Antsiranana</Link></li>
@@ -45,18 +45,8 @@ const Header = () => {
                 <li><Link className="dropdown-item text-white" to="pages/Tamatave">Tamatavy</Link></li>
               </ul>
             </li>
-            <li className="nav-item dropdown col-md">
-              <a className="nav-Link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Partenaire
-              </a>
-              <ul className="dropdown-menu  bg-primary">
-                <li><Link className="dropdown-item text-white" to="pages/Shop">Shop</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Grossiste">Grossite</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Magasin">Magasin</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Personnel">Personnelle</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Importation">Imporatateur</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Exportation">Exportataire</Link></li>
-              </ul>
+            <li className="nav-item col-md">
+              <Link className="nav-Link text-white" to="pages/Partenaire">Partenaire</Link>
             </li>
             <li className="nav-item col-md">
               <Link className="nav-Link text-white" to="Membre/Inscription">Inscription</Link>

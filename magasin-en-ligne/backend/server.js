@@ -82,6 +82,9 @@ app.post('/api/inscription', upload.single('image'), (req, res) => {
   });
 });
 
+
+
+
 // Route de login
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
@@ -148,6 +151,127 @@ app.get('/api/membres', (req, res) => {
     });
 
     res.status(200).json({ membres: membresWithImages });
+  });
+});
+
+
+app.post('/api/Action', upload.single('produit_image'), (req, res) => {
+  const { produit_nom, produit_description,produit_prix,produit_type,produit_lieu } = req.body;
+  const imagePath = req.file ? req.file.path : null;
+
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error('Erreur lors de la transaction :', err);
+      return res.status(500).send('Erreur lors de la transaction');
+    }
+
+    const query = `
+      INSERT INTO produit (produit_nom, produit_description, produit_image,produit_prix,produit_type,produit_lieu)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(query, [produit_nom, produit_description, imagePath, produit_prix, produit_type,produit_lieu], 
+        (err, result) => 
+        {
+         if (err) {
+        console.error('Erreur lors de l\'ajout du produit :', err);
+        return db.rollback(() => {
+          res.status(500).send({ message: 'Erreur lors de l’ajout du produit', error: err });
+        });
+      }
+
+      db.commit((err) => {
+        if (err) {
+          console.error('Erreur lors de la validation de la transaction :', err);
+          return db.rollback(() => {
+            res.status(500).send('Erreur lors de la validation de la transaction');
+          });
+        }
+
+        console.log('Produit ajouté avec succès :', result);
+        res.status(200).send('Produit ajouté avec succès');
+      });
+    });
+  });
+});
+
+
+
+
+//Affichage des produit
+
+app.get('/api/action', (req, res) => {
+  const query = 'SELECT * FROM produit';
+
+  db.query(query, (err, result) => {
+    if (err) {
+      console.error('Erreur lors de la récupération des produit:', err);
+      return res.status(500).send({ message: 'Erreur de serveur', error: err });
+    }
+
+    const membresWithImages = result.map((produit) => {
+      if (produit.produit_image) {
+        // Corrigez les backslashes en slashes
+        const correctedPath = membre.image.replace(/\\/g, '/');
+        membre.produit_image = `http://localhost:5000/${correctedPath}`;
+      } else {
+        console.log(`Aucune image pour le membre ID: ${produit.id}`);
+      }
+      console.log('Image finale pour ce membre:', produit.produit_image);
+      return produit;
+    });
+
+    res.status(200).json({ produit: membresWithImages });
+  });
+});
+
+
+
+
+//Affichage des produit 
+// Fonction générique pour récupérer les produits
+const getProducts = (filter = {}) => {
+  let query = 'SELECT * FROM produit';
+  const conditions = [];
+  const values = [];
+
+  if (filter.lieu) {
+    conditions.push('produit_lieu = ?');
+    values.push(filter.lieu);
+  }
+
+  if (filter.type) {
+    conditions.push('produit_type = ?');
+    values.push(filter.type);
+  }
+
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
+  }
+
+  return { query, values };
+};
+
+// Endpoint pour récupérer les produits avec filtres
+app.get('/api/produits', (req, res) => {
+  const { lieu, type } = req.query;
+  const { query, values } = getProducts({ lieu, type });
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error('Erreur lors de la récupération des produits:', err);
+      return res.status(500).send({ message: 'Erreur de serveur', error: err });
+    }
+
+    const produitsWithImages = result.map((produit) => {
+      if (produit.produit_image) {
+        const correctedPath = produit.produit_image.replace(/\\/g, '/');
+        produit.produit_image = `http://localhost:5000/${correctedPath}`;
+      }
+      return produit;
+    });
+
+    res.status(200).json({ produits: produitsWithImages });
   });
 });
 
