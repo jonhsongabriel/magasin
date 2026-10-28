@@ -275,6 +275,87 @@ app.get('/api/produits', (req, res) => {
   });
 });
 
+/* ------------------------------------------------------------------ */
+/* COMMANDES & PAIEMENTS                                              */
+/* ------------------------------------------------------------------ */
+
+// Création d'une table `commandes` si absente (id, client_json, articles_json,
+// total, mode_paiement, paiement_details_json, statut, created_at)
+app.post('/api/commandes', (req, res) => {
+  const { client, articles, total, mode_paiement, paiement_details } = req.body || {};
+
+  if (!client || !Array.isArray(articles) || articles.length === 0 || !mode_paiement) {
+    return res.status(400).json({
+      message: 'Commande invalide : client, articles et mode_paiement sont requis.',
+    });
+  }
+
+  const sql = `INSERT INTO commandes
+    (client_json, articles_json, total, mode_paiement, paiement_details_json, statut)
+    VALUES (?, ?, ?, ?, ?, 'en_attente')`;
+
+  db.query(
+    sql,
+    [
+      JSON.stringify(client),
+      JSON.stringify(articles),
+      Number(total) || 0,
+      mode_paiement,
+      JSON.stringify(paiement_details || {}),
+    ],
+    (err, result) => {
+      if (err) {
+        console.error('Erreur enregistrement commande:', err);
+        return res.status(500).json({ message: 'Erreur serveur lors de la commande.' });
+      }
+      res.status(201).json({
+        message: 'Commande enregistrée avec succès.',
+        commande: {
+          id: result.insertId,
+          numero: `CMD-${result.insertId}`,
+          client,
+          articles,
+          total,
+          mode_paiement,
+          statut: 'en_attente',
+        },
+      });
+    },
+  );
+});
+
+// Liste des commandes (back-office)
+app.get('/api/commandes', (req, res) => {
+  db.query('SELECT * FROM commandes ORDER BY id DESC', (err, rows) => {
+    if (err) {
+      return res.status(500).json({ message: 'Erreur serveur.' });
+    }
+    res.status(200).json({ commandes: rows });
+  });
+});
+
+// Détail d'une commande
+app.get('/api/commandes/:id', (req, res) => {
+  db.query('SELECT * FROM commandes WHERE id = ?', [req.params.id], (err, rows) => {
+    if (err) return res.status(500).json({ message: 'Erreur serveur.' });
+    if (rows.length === 0) return res.status(404).json({ message: 'Commande introuvable.' });
+    const row = rows[0];
+    res.status(200).json({
+      commande: {
+        id: row.id,
+        numero: `CMD-${row.id}`,
+        client: JSON.parse(row.client_json || '{}'),
+        articles: JSON.parse(row.articles_json || '[]'),
+        total: row.total,
+        mode_paiement: row.mode_paiement,
+        paiement_details: JSON.parse(row.paiement_details_json || '{}'),
+        statut: row.statut,
+        created_at: row.created_at,
+      },
+    });
+  });
+});
+
 
 // Lancer le serveur
 app.listen(port, () => {

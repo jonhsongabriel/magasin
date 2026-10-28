@@ -26,15 +26,20 @@ import AjoutProduit from './Action/AjoutProduit';
 import Partenaire from './pages/Partenaire';
 
 import { SearchProvider } from './SearchContext';
+import { CartProvider } from './CartContext';
 import SearchResultsPage from './SearchResultsPage';
+import Panier from './pages/Panier';
+import Commande from './pages/Commande';
+import CommandeConfirmation from './pages/CommandeConfirmation';
 
 function App() {
   return (
     <SearchProvider> {/* Fournisseur ajouté ici */}
-      <div>
-        <Router>
-          <Header />
-          <Routes>
+      <CartProvider>
+        <div>
+          <Router>
+            <Header />
+            <Routes>
             {/* Routes principales */}
             <Route path="/" element={<Accueil />} />
             <Route path="/Membre/Connection" element={<Connection />} />
@@ -62,14 +67,21 @@ function App() {
             {/* Page pour des produits */}
             <Route path='/Action/AjoutProduit' element={<AjoutProduit />} />
 
+            {/* Panier & commande */}
+            <Route path="/panier" element={<Panier />} />
+            <Route path="/commande" element={<Commande />} />
+            <Route path="/commande/confirmation" element={<CommandeConfirmation />} />
+
             {/* Résultats de recherche */}
             <Route path="/results" element={<SearchResultsPage />} />
           </Routes>
           <Footer />
         </Router>
-      </div>
+        </div>
+      </CartProvider>
     </SearchProvider>
   );
 }
 
 export default App;
+

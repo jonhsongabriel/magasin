@@ -2,9 +2,11 @@ import React, { useContext, useState } from 'react'; // Importation des hooks Re
 import { Link } from 'react-router-dom';
 import jonhsonLogo from '../assets/jonhson-logo.jpg';
 import { SearchContext } from '../SearchContext';
+import { useCart } from '../CartContext';
 
 const Header = () => {
   const { handleSearch } = useContext(SearchContext); // Utilisation du contexte
+  const { count } = useCart(); // Nombre d'articles dans le panier
   
   const [searchQuery, setSearchQuery] = useState(''); // Déclaration d'un état local
   
@@ -67,6 +69,11 @@ const Header = () => {
             </li>
             <li className="nav-item col-md">
               <Link className="nav-Link text-white" to="Membre/Inscription">Inscription</Link>
+            </li>
+            <li className="nav-item col-md">
+              <Link className="nav-Link text-white" to="/panier">
+                🛒 Panier {count > 0 && <span className="badge bg-success">{count}</span>}
+              </Link>
             </li>
             <li className="nav-item col-md">
               <Link className="nav-Link text-white" to="Membre/Connection">Connection</Link>
