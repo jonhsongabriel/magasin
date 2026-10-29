@@ -16,3 +16,9 @@ CREATE TABLE IF NOT EXISTS commandes (
 ) ENGINE=InnoDB;
 
 -- Statuts possibles : en_attente, payee, expediee, livree, annulee
+
+-- Recherche rapide sur les produits
+-- (aucune table à créer, mais index utile pour la recherche)
+ALTER TABLE produit ADD INDEX idx_produit_nom (produit_nom);
+ALTER TABLE produit ADD INDEX idx_produit_type (produit_type);
+ALTER TABLE produit ADD INDEX idx_produit_lieu (produit_lieu);

@@ -1,22 +1,26 @@
-// src/SearchContext.js
+// src/SearchContext.js — Recherche de produits via le backend
 import React, { createContext, useState } from 'react';
-
-// Données locales directement dans ce fichier
-const data = [
-  { name: 'Antananarivo', slug: 'antananarivo' },
-  { name: 'Mahajanga', slug: 'mahajanga' },
-  { name: 'Fianarantsoa', slug: 'fianarantsoa' },
-  // Ajoutez ici plus de données à rechercher
-];
 
 export const SearchContext = createContext();
 
 export const SearchProvider = ({ children }) => {
   const [searchResults, setSearchResults] = useState([]);
 
-  const handleSearch = (query) => {
-    const results = data.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
-    setSearchResults(results);
+  const handleSearch = async (query) => {
+    if (!query || query.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/produits?search=${encodeURIComponent(query)}`,
+      );
+      const data = await res.json();
+      setSearchResults(data.produits || []);
+    } catch (err) {
+      console.error('Erreur de recherche:', err);
+      setSearchResults([]);
+    }
   };
 
   return (

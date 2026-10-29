@@ -28,6 +28,10 @@ const CommandeConfirmation = () => {
         Votre commande <strong>{commande.numero || commande.id}</strong> a été
         enregistrée avec succès.
       </p>
+      <div className="alert alert-info mx-auto" style={{ maxWidth: 520 }}>
+        📧 Une facture détaillée vient d'être envoyée à votre adresse email :
+        <strong> {commande.client?.email}</strong>
+      </div>
       <div className="card shadow-sm mx-auto" style={{ maxWidth: 520 }}>
         <div className="card-header bg-light">
           <strong>Détails de la commande</strong>

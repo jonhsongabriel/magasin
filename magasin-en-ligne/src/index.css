@@ -1,8 +1,9 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Helvetica Neue', sans-serif;
+  background: #f4f4f4;
+  color: #222;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -10,4 +11,250 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* ================= ALIBABA STYLE - HEADER ================= */
+
+.site-header {
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+}
+
+.header-top {
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.header-brand img {
+  height: 52px;
+  width: auto;
+  border-radius: 6px;
+}
+
+.header-search {
+  flex: 1;
+  display: flex;
+  min-width: 280px;
+  max-width: 720px;
+  margin: 0 auto;
+  border: 2px solid #ff6a00;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.header-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 10px 14px;
+  font-size: 15px;
+  color: #222;
+}
+
+.header-search button {
+  background: #ff6a00;
+  color: #fff;
+  border: none;
+  padding: 0 22px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.header-search button:hover {
+  background: #e85f00;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.header-actions .header-cart {
+  position: relative;
+  color: #333;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.header-actions .header-cart:hover {
+  color: #ff6a00;
+}
+
+.header-badge {
+  background: #ff6a00;
+  color: #fff;
+  border-radius: 999px;
+  font-size: 11px;
+  padding: 2px 7px;
+  margin-left: 4px;
+}
+
+/* --- Nav principale (centrée, même ligne que le logo) --- */
+
+.header-nav {
+  background: #ffffff;
+  border-top: 1px solid #eeeeee;
+}
+
+.header-nav ul {
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 0 16px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.header-nav a,
+.header-nav .nav-category {
+  display: inline-block;
+  color: #333;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.header-nav a:hover,
+.header-nav .nav-category:hover {
+  background: #fff3ea;
+  color: #ff6a00;
+}
+
+.header-nav a.active {
+  color: #ff6a00;
+}
+
+/* --- Menus déroulants (ouverts au survol) --- */
+
+.header-dropdown {
+  position: relative;
+}
+
+.header-dropdown .dropdown-menu {
+  border: 1px solid #eee;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 8px;
+  min-width: 220px;
+  /* Ouverture au survol — le menu est caché par défaut */
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin: 0;
+}
+
+.header-dropdown:hover .dropdown-menu,
+.header-dropdown:focus-within .dropdown-menu {
+  display: block;
+}
+
+.header-dropdown .dropdown-item {
+  color: #333;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  text-decoration: none;
+  display: block;
+  transition: background 0.15s, color 0.15s;
+}
+
+.header-dropdown .dropdown-item:hover {
+  background: #fff3ea;
+  color: #ff6a00;
+}
+
+/* ================= ALIBABA STYLE - FOOTER ================= */
+
+.site-footer {
+  background: #1f2a33;
+  color: #cfd8dd;
+  margin-top: 48px;
+  padding: 48px 0 24px;
+}
+
+.footer-inner {
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.footer-brand img {
+  height: 48px;
+  border-radius: 6px;
+}
+
+.footer-brand h3 {
+  color: #ffffff;
+  margin: 0;
+  font-size: 22px;
+}
+
+.footer-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.footer-columns h4 {
+  color: #ffffff;
+  font-size: 16px;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #ff6a00;
+  display: inline-block;
+}
+
+.footer-columns a {
+  color: #cfd8dd;
+  text-decoration: none;
+  font-size: 14px;
+  display: block;
+  padding: 4px 0;
+  transition: color 0.15s;
+}
+
+.footer-columns a:hover {
+  color: #ff6a00;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 16px;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 13px;
+  color: #9fb0ba;
+}
+
+.footer-bottom strong {
+  color: #ff6a00;
 }

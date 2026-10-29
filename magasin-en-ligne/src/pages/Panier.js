@@ -2,14 +2,38 @@
 // Importation des modules
 import React, { useState } from 'react';
 import { useCart } from '../CartContext';
-import jonhsonLogo from '../assets/jonhson-logo.jpg';
+import jonhsonLogo from '../assets/jonhson-magasin.jpg';
 
 const MODES_PAIEMENT = [
-  { value: 'mobile_money', label: '📱 Mobile Money (Mvola, Orange Money, Airtel Money)' },
+  { value: 'mvola', label: '📱 MVola (Telma)' },
+  { value: 'orange_money', label: '🍊 Orange Money' },
+  { value: 'airtel_money', label: '🔴 Airtel Money' },
   { value: 'carte_bancaire', label: '💳 Carte bancaire (Visa, Mastercard)' },
+  { value: 'paypal', label: '🅿️ PayPal' },
   { value: 'virement', label: '🏦 Virement bancaire' },
   { value: 'especes', label: '💵 Espèces à la livraison' },
 ];
+
+// Modes qui nécessitent une référence / numéro de transaction
+const MODES_AVEC_REFERENCE = [
+  'mvola', 'orange_money', 'airtel_money', 'carte_bancaire', 'paypal',
+];
+
+// Placeholder dynamique selon le mode choisi
+const placeholderReference = (mode) => {
+  switch (mode) {
+    case 'mvola':
+    case 'orange_money':
+    case 'airtel_money':
+      return 'Numéro Mobile Money utilisé (ex: 034 12 345 67) *';
+    case 'carte_bancaire':
+      return '4 derniers chiffres de la carte *';
+    case 'paypal':
+      return 'Email de votre compte PayPal *';
+    default:
+      return 'Référence *';
+  }
+};
 
 const Panier = () => {
   const { cart, removeFromCart, changeQuantity, clearCart } = useCart();
@@ -30,8 +54,7 @@ const Panier = () => {
 
   const validerPaiement = () => {
     if (!modePaiement) return false;
-    if (modePaiement === 'mobile_money' && !paiementDetails.reference) return false;
-    if (modePaiement === 'carte_bancaire' && !paiementDetails.reference) return false;
+    if (MODES_AVEC_REFERENCE.includes(modePaiement) && !paiementDetails.reference) return false;
     return true;
   };
 
@@ -110,6 +133,10 @@ const Panier = () => {
                 <span className="badge bg-warning text-dark">
                   {commandeConfirmee.statut}
                 </span>
+              </li>
+              <li className="list-group-item d-flex justify-content-between">
+                <span>📧 Facture</span>
+                <strong>Envoyée à {commandeConfirmee.client.email}</strong>
               </li>
             </ul>
             <button
@@ -220,10 +247,10 @@ const Panier = () => {
                   ))}
                 </select>
 
-                {(modePaiement === 'mobile_money' || modePaiement === 'carte_bancaire') && (
+                {MODES_AVEC_REFERENCE.includes(modePaiement) && (
                   <input
                     className="form-control mb-2"
-                    placeholder="Référence (n° transaction / carte) *"
+                    placeholder={placeholderReference(modePaiement)}
                     value={paiementDetails.reference}
                     onChange={(e) =>
                       setPaiementDetails({ ...paiementDetails, reference: e.target.value })

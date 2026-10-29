@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'; // Importation des hooks React
 import { Link } from 'react-router-dom';
-import jonhsonLogo from '../assets/jonhson-logo.jpg';
+import jonhsonLogo from '../assets/jonhson-magasin.jpg';
 import { SearchContext } from '../SearchContext';
 import { useCart } from '../CartContext';
 
@@ -25,77 +25,66 @@ const Header = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg bg-danger text-white">
-      <div className="container-fluid">
-        <Link className="navbar-brand" aria-current="page" to="/">
-          <img src={jonhsonLogo} alt="Jonhson Logo" style={{ width: 100 }} />
+    <header className="site-header">
+      {/* --- Ligne 1 : logo + recherche + actions --- */}
+      <div className="header-top">
+        <Link className="header-brand" to="/">
+          <img src={jonhsonLogo} alt="Jonhson Magasin" />
         </Link>
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0 row">
-            <li className="nav-item col-md">
-              <Link className="nav-Link text-white active" aria-current="page" to="pages/Apropos">A propos</Link>
-            </li>
-            <li className="nav-item dropdown col-md">
-              <a className="nav-Link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Produit
-              </a>
-              <ul className="dropdown-menu bg-primary dropdown-item-custom text-center">
-                <li><Link className="dropdown-item text-white" to="pages/Tech">Technologique</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Aliment">Alimentaire</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Construction">Construction</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Mode">Mode</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Mecanique">Mecanique</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Medicale">Medicale</Link></li>
-              </ul>
-            </li>
-            <li className="nav-item dropdown col-md">
-              <a className="nav-Link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Contact
-              </a>
-              <ul className="dropdown-menu bg-primary text-center">
-                <li><Link className="dropdown-item text-white" to="pages/Antananarivo">Antananarivo</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Fianarantsoa">Fianarantsoa</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Antsiranana">Antsiranana</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Mahajanga">Mahajanga</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Toliara">Toliara</Link></li>
-                <li><Link className="dropdown-item text-white" to="pages/Tamatave">Tamatavy</Link></li>
-              </ul>
-            </li>
-            <li className="nav-item col-md">
-              <Link className="nav-Link text-white" to="pages/Partenaire">Partenaire</Link>
-            </li>
-            <li className="nav-item col-md">
-              <Link className="nav-Link text-white" to="Membre/Inscription">Inscription</Link>
-            </li>
-            <li className="nav-item col-md">
-              <Link className="nav-Link text-white" to="/panier">
-                🛒 Panier {count > 0 && <span className="badge bg-success">{count}</span>}
-              </Link>
-            </li>
-            <li className="nav-item col-md">
-              <Link className="nav-Link text-white" to="Membre/Connection">Connection</Link>
-            </li>
-            <li className="nav-item col-md">
-              <Link className="nav-Link text-white" to="Membre/ListeMembres">Membres</Link>
-            </li>
-          </ul>
-          <form onSubmit={handleSearchSubmit} className='d-flex'>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={handleInputChange}
-              placeholder="Rechercher..."
-              className='form-contrlo me-2'
-            />
-            <button type="submit" className='btn btn-success btn btn-outline-danger text-white border'>Chercher</button>
-          </form>
-          
+
+        <form onSubmit={handleSearchSubmit} className="header-search">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleInputChange}
+            placeholder="Rechercher un produit, une marque..."
+          />
+          <button type="submit">Chercher</button>
+        </form>
+
+        <div className="header-actions">
+          <Link className="header-cart" to="Membre/Connection">Connection</Link>
+          <Link className="header-cart" to="/panier">
+            🛒 Panier{count > 0 && <span className="header-badge">{count}</span>}
+          </Link>
         </div>
       </div>
-    </nav>
+
+      {/* --- Ligne 2 : navigation --- */}
+      <nav className="header-nav">
+        <ul>
+          <li><Link to="pages/Apropos">A propos</Link></li>
+
+          <li className="header-dropdown">
+            <span className="nav-category dropdown-toggle">Produit</span>
+            <ul className="dropdown-menu">
+              <li><Link className="dropdown-item" to="pages/Tech">Technologique</Link></li>
+              <li><Link className="dropdown-item" to="pages/Aliment">Alimentaire</Link></li>
+              <li><Link className="dropdown-item" to="pages/Construction">Construction</Link></li>
+              <li><Link className="dropdown-item" to="pages/Mode">Mode</Link></li>
+              <li><Link className="dropdown-item" to="pages/Mecanique">Mecanique</Link></li>
+              <li><Link className="dropdown-item" to="pages/Medicale">Medicale</Link></li>
+            </ul>
+          </li>
+
+          <li className="header-dropdown">
+            <span className="nav-category dropdown-toggle">Contact</span>
+            <ul className="dropdown-menu">
+              <li><Link className="dropdown-item" to="pages/Antananarivo">Antananarivo</Link></li>
+              <li><Link className="dropdown-item" to="pages/Fianarantsoa">Fianarantsoa</Link></li>
+              <li><Link className="dropdown-item" to="pages/Antsiranana">Antsiranana</Link></li>
+              <li><Link className="dropdown-item" to="pages/Mahajanga">Mahajanga</Link></li>
+              <li><Link className="dropdown-item" to="pages/Toliara">Toliara</Link></li>
+              <li><Link className="dropdown-item" to="pages/Tamatave">Tamatavy</Link></li>
+            </ul>
+          </li>
+
+          <li><Link to="pages/Partenaire">Partenaire</Link></li>
+          <li><Link to="Membre/Inscription">Inscription</Link></li>
+          <li><Link to="Membre/ListeMembres">Membres</Link></li>
+        </ul>
+      </nav>
+    </header>
   );
 };
 

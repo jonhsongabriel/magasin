@@ -1,7 +1,7 @@
 // src/pages/Home.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import jonhsonLogo from '../assets/jonhson-logo.jpg';
+import jonhsonLogo from '../assets/jonhson-magasin.jpg';
 
 
 const Partenaire = () => {
