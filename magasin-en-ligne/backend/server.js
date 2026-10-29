@@ -188,8 +188,126 @@ async function envoyerFactureEmail(commande) {
 }
 
 /* ------------------------------------------------------------------ */
+/* NOTIFICATIONS MEMBRES — email automatique à chaque nouveau produit  */
+/* ------------------------------------------------------------------ */
+async function notifierMembresNouveauProduit(produit) {
+  try {
+    const membres = await db.query(
+      'SELECT email, nom FROM utilisateurs WHERE email IS NOT NULL',
+    );
+    if (membres.rows.length === 0) return;
+
+    const listeEmails = membres.rows.map((m) => m.email).join(',');
+    await transporter.sendMail({
+      from: `"Jonhson Magasin" <${process.env.SMTP_USER || 'no-reply@jonhson.mg'}>`,
+      to: listeEmails,
+      subject: `🆕 Nouveau produit : ${produit.produit_nom}`,
+      html: `
+        <h2>Un nouveau produit est arrivé !</h2>
+        <p><b>${produit.produit_nom}</b> — ${Number(produit.produit_prix).toLocaleString('fr-FR')} Ar</p>
+        <p>${produit.produit_description || ''}</p>
+        <p>Type : ${produit.produit_type || '—'} · Ville : ${produit.produit_lieu || '—'}</p>
+        <p>👉 Rendez-vous sur <a href="http://localhost:3000/produit/${produit.id}">la fiche produit</a> pour commander !</p>
+      `,
+    });
+    console.log(`Notification envoyée à ${membres.rows.length} membres.`);
+  } catch (err) {
+    console.error('Erreur notification membres:', err.message);
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* MEMBRES                                                             */
 /* ------------------------------------------------------------------ */
+
+// Connexion simple : nom + email + téléphone + adresse (crée le compte si absent)
+app.post('/api/membres/connexion', async (req, res) => {
+  const { nom, email, telephone, adresse } = req.body || {};
+  if (!nom || !email) {
+    return res.status(400).json({ message: 'Nom et email sont requis.' });
+  }
+  try {
+    let result = await db.query('SELECT * FROM utilisateurs WHERE email = $1', [email]);
+
+    if (result.rows.length === 0) {
+      // Nouveau membre : compte créé automatiquement (pas de mot de passe)
+      result = await db.query(
+        `INSERT INTO utilisateurs (nom, contact, adresse, email, password, prenom)
+         VALUES ($1, $2, $3, $4, 'COMPTE-SIMPLE', '') RETURNING *`,
+        [nom, telephone || null, adresse || null, email],
+      );
+      console.log('Nouveau membre créé :', email);
+    }
+
+    const user = result.rows[0];
+    const token = jwt.sign(
+      { id: user.id, email: user.email, nom: user.nom },
+      process.env.JWT_SECRET || 'secret-par-defaut',
+      { expiresIn: '7d' },
+    );
+    res.status(200).json({
+      message: 'Connexion réussie',
+      token,
+      membre: { id: user.id, nom: user.nom, email: user.email, contact: user.contact, adresse: user.adresse },
+    });
+  } catch (err) {
+    console.error('Erreur connexion membre:', err.message);
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// Authentification Google (Google Identity Services)
+// Le frontend envoie le "credential" (ID token) et on le vérifie côté serveur.
+app.post('/api/auth/google', async (req, res) => {
+  const { credential } = req.body || {};
+  if (!credential) {
+    return res.status(400).json({ message: 'Credential Google manquant.' });
+  }
+  try {
+    // Vérification du token via l'API publique Google
+    const verifyRes = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`,
+    );
+    if (!verifyRes.ok) {
+      return res.status(401).json({ message: 'Token Google invalide.' });
+    }
+    const profil = await verifyRes.json();
+
+    // Vérifier l'audience (client ID) si configurée
+    if (process.env.GOOGLE_CLIENT_ID && profil.aud !== process.env.GOOGLE_CLIENT_ID) {
+      return res.status(401).json({ message: 'Client Google non autorisé.' });
+    }
+    if (profil.email_verified !== 'true' && profil.email_verified !== true) {
+      return res.status(401).json({ message: 'Email Google non vérifié.' });
+    }
+
+    // Trouver ou créer le membre
+    let result = await db.query('SELECT * FROM utilisateurs WHERE email = $1', [profil.email]);
+    if (result.rows.length === 0) {
+      result = await db.query(
+        `INSERT INTO utilisateurs (nom, prenom, email, password, adresse, contact)
+         VALUES ($1, $2, $3, 'COMPTE-GOOGLE', '', '') RETURNING *`,
+        [profil.family_name || profil.name || profil.email, profil.given_name || '', profil.email],
+      );
+      console.log('Nouveau membre via Google :', profil.email);
+    }
+
+    const user = result.rows[0];
+    const token = jwt.sign(
+      { id: user.id, email: user.email, nom: user.nom },
+      process.env.JWT_SECRET || 'secret-par-defaut',
+      { expiresIn: '7d' },
+    );
+    res.status(200).json({
+      message: 'Connexion Google réussie',
+      token,
+      membre: { id: user.id, nom: user.nom, email: user.email, contact: user.contact, adresse: user.adresse },
+    });
+  } catch (err) {
+    console.error('Erreur auth Google:', err.message);
+    res.status(500).json({ message: 'Erreur serveur lors de la vérification Google.' });
+  }
+});
 
 // Route d'inscription — mot de passe haché avec bcrypt
 app.post('/api/inscription', upload.single('image'), async (req, res) => {
@@ -211,7 +329,7 @@ app.post('/api/inscription', upload.single('image'), async (req, res) => {
   }
 });
 
-// Route de login
+// Route de login (ancienne, conservée pour compatibilité)
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -272,12 +390,21 @@ app.post('/api/action', verifierAdmin, upload.single('produit_image'), async (re
   const imagePath = req.file ? req.file.path : null;
 
   try {
-    await db.query(
+    const insert = await db.query(
       `INSERT INTO produit (produit_nom, produit_description, produit_image, produit_prix, produit_type, produit_lieu)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
       [produit_nom, produit_description, imagePath, produit_prix, produit_type, produit_lieu],
     );
     console.log('Produit ajouté avec succès');
+    // Notification automatique à tous les membres (sans bloquer la réponse)
+    notifierMembresNouveauProduit({
+      id: insert.rows[0].id,
+      produit_nom,
+      produit_description,
+      produit_prix,
+      produit_type,
+      produit_lieu,
+    });
     res.status(200).send('Produit ajouté avec succès');
   } catch (err) {
     console.error("Erreur lors de l'ajout du produit :", err.message);

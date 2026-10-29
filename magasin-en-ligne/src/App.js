@@ -5,7 +5,6 @@ import Accueil from './Accueil';
 import Header from './componement/Header';
 import Footer from './componement/Footer';
 import Connection from './Membre/Connection';
-import Inscription from './Membre/Inscription';
 import Aliment from './pages/Aliment';
 import Antananarivo from './pages/Antananarivo';
 import Antsiranana from './pages/Antsiranana';
@@ -45,7 +44,6 @@ function App() {
             {/* Routes principales */}
             <Route path="/" element={<Accueil />} />
             <Route path="/Membre/Connection" element={<Connection />} />
-            <Route path="/Membre/Inscription" element={<Inscription />} />
             <Route path="/Membre/ListeMembres" element={<ListeMembres />} />
 
             {/* Pages supplémentaires */}
