@@ -74,3 +74,18 @@ ALTER TABLE commandes ADD COLUMN IF NOT EXISTS frais_livraison NUMERIC(10,2) NOT
 -- Modes de livraison possibles :
 -- a_prendre, livreur_moto, bicyclette, personne, automobile, navire,
 -- avion, colis_express, autres
+
+-- ------------------------------------------------------------
+-- TABLE livreurs (coursiers gérés par l'admin)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS livreurs (
+  id            SERIAL PRIMARY KEY,
+  nom           VARCHAR(100) NOT NULL,
+  prenom        VARCHAR(100),
+  telephone     VARCHAR(50) NOT NULL,
+  email         VARCHAR(255),
+  type_vehicule VARCHAR(50) NOT NULL,  -- moto, bicyclette, personne, automobile, navire, avion, colis_express, autres
+  ville         VARCHAR(100),
+  disponible    BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

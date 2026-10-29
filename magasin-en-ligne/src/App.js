@@ -32,6 +32,7 @@ import Panier from './pages/Panier';
 import Commande from './pages/Commande';
 import CommandeConfirmation from './pages/CommandeConfirmation';
 import Admin from './pages/Admin';
+import DetailProduit from './pages/DetailProduit';
 
 function App() {
   return (
@@ -75,6 +76,9 @@ function App() {
 
             {/* Espace admin */}
             <Route path="/admin" element={<Admin />} />
+
+            {/* Fiche produit détaillée */}
+            <Route path="/produit/:id" element={<DetailProduit />} />
 
             {/* Résultats de recherche */}
             <Route path="/results" element={<SearchResultsPage />} />

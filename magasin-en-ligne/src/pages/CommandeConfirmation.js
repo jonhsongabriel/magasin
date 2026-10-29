@@ -6,14 +6,15 @@ const CommandeConfirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const commande = location.state?.commande || null;
+  const liens = location.state?.liens_facture || null;
 
   useEffect(() => {
     if (!commande) {
       navigate('/commande');
       return;
     }
-    // Retour automatique à la boutique après 30 secondes.
-    const timer = setTimeout(() => navigate('/'), 30000);
+    // Retour automatique à la boutique après 90 secondes.
+    const timer = setTimeout(() => navigate('/'), 90000);
     return () => clearTimeout(timer);
   }, [commande, navigate]);
 
@@ -32,6 +33,28 @@ const CommandeConfirmation = () => {
         📧 Une facture détaillée vient d'être envoyée à votre adresse email :
         <strong> {commande.client?.email}</strong>
       </div>
+
+      {/* --- Partage de la facture --- */}
+      {liens && (
+        <div className="mx-auto mt-3" style={{ maxWidth: 520 }}>
+          <h6>📨 Recevez/gardez votre facture où vous voulez :</h6>
+          <div className="d-flex gap-2 justify-content-center flex-wrap">
+            <a className="btn btn-success" target="_blank" rel="noreferrer" href={liens.whatsapp}>
+              💬 WhatsApp
+            </a>
+            <a className="btn btn-primary" target="_blank" rel="noreferrer" href={liens.facebook}>
+              📘 Facebook
+            </a>
+            <a className="btn btn-outline-secondary" href={liens.sms}>
+              ✉️ SMS
+            </a>
+          </div>
+          <details className="mt-2 small text-muted">
+            <summary>Voir le résumé à copier</summary>
+            <pre style={{ whiteSpace: 'pre-wrap', fontSize: 12 }}>{liens.texte}</pre>
+          </details>
+        </div>
+      )}
       <div className="card shadow-sm mx-auto" style={{ maxWidth: 520 }}>
         <div className="card-header bg-light">
           <strong>Détails de la commande</strong>

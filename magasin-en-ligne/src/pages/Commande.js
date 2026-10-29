@@ -140,7 +140,9 @@ const Commande = () => {
         throw new Error(data.message || "Erreur lors de l'enregistrement de la commande.");
       }
       clearCart();
-      navigate('/commande/confirmation', { state: { commande: data.commande } });
+      navigate('/commande/confirmation', {
+        state: { commande: data.commande, liens_facture: data.liens_facture },
+      });
     } catch (err) {
       setError(
         err.message ||

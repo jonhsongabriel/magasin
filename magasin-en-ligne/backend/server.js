@@ -143,6 +143,24 @@ function genererFacturePDF(commande) {
   });
 }
 
+// Génère les liens de partage de la facture (WhatsApp, Facebook Messenger, SMS)
+function genererLiensFacture(commande) {
+  const resumerFacture =
+    `🧾 FACTURE ${commande.numero} — Jonhson Magasin\n` +
+    `Client : ${commande.client.nom || ''}\n` +
+    commande.articles.map((a) => `• ${a.nom} x${a.quantite} = ${(a.prix * a.quantite).toLocaleString('fr-FR')} Ar`).join('\n') +
+    `\nTotal : ${Number(commande.total).toLocaleString('fr-FR')} Ar\n` +
+    `Paiement : ${commande.mode_paiement} · Livraison : ${commande.mode_livraison || 'a_prendre'}`;
+  const tel = (commande.client.telephone || '').replace(/[^0-9]/g, '');
+  const telIntl = tel.startsWith('261') ? tel : `261${tel.replace(/^0+/, '')}`;
+  return {
+    texte: resumerFacture,
+    whatsapp: `https://wa.me/${telIntl}?text=${encodeURIComponent(resumerFacture)}`,
+    facebook: `https://www.facebook.com/dialog/send?link=${encodeURIComponent('http://localhost:3000/commande/confirmation')}&app_id=0&redirect_uri=${encodeURIComponent('http://localhost:3000')}`,
+    sms: `sms:${commande.client.telephone}?body=${encodeURIComponent(resumerFacture)}`,
+  };
+}
+
 // Envoie la facture par email au client
 async function envoyerFactureEmail(commande) {
   if (!commande.client.email) return;
@@ -302,6 +320,92 @@ app.patch('/api/commandes/:id/statut', verifierAdmin, async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur.' });
   }
 });
+
+/* ------------------------------------------------------------------ */
+/* LIVREURS (coursiers) — gestion admin                                */
+/* ------------------------------------------------------------------ */
+
+// Liste des livreurs (admin)
+app.get('/api/livreurs', verifierAdmin, async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM livreurs ORDER BY id DESC');
+    res.status(200).json({ livreurs: result.rows });
+  } catch (err) {
+    console.error('Erreur livreurs:', err.message);
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// Ajouter un livreur (admin)
+app.post('/api/livreurs', verifierAdmin, async (req, res) => {
+  const { nom, prenom, telephone, email, type_vehicule, ville } = req.body || {};
+  if (!nom || !telephone || !type_vehicule) {
+    return res.status(400).json({ message: 'Nom, téléphone et type de véhicule sont requis.' });
+  }
+  try {
+    const result = await db.query(
+      `INSERT INTO livreurs (nom, prenom, telephone, email, type_vehicule, ville)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [nom, prenom || null, telephone, email || null, type_vehicule, ville || null],
+    );
+    res.status(201).json({ message: 'Livreur ajouté.', livreur: result.rows[0] });
+  } catch (err) {
+    console.error('Erreur ajout livreur:', err.message);
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// Modifier un livreur (admin)
+app.patch('/api/livreurs/:id', verifierAdmin, async (req, res) => {
+  const { nom, prenom, telephone, email, type_vehicule, ville, disponible } = req.body || {};
+  try {
+    const result = await db.query(
+      `UPDATE livreurs SET
+         nom = COALESCE($1, nom),
+         prenom = COALESCE($2, prenom),
+         telephone = COALESCE($3, telephone),
+         email = COALESCE($4, email),
+         type_vehicule = COALESCE($5, type_vehicule),
+         ville = COALESCE($6, ville),
+         disponible = COALESCE($7, disponible)
+       WHERE id = $8 RETURNING *`,
+      [nom, prenom, telephone, email, type_vehicule, ville, disponible, req.params.id],
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Livreur introuvable.' });
+    }
+    res.status(200).json({ message: 'Livreur mis à jour.', livreur: result.rows[0] });
+  } catch (err) {
+    console.error('Erreur maj livreur:', err.message);
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// Supprimer un livreur (admin)
+app.delete('/api/livreurs/:id', verifierAdmin, async (req, res) => {
+  try {
+    const result = await db.query('DELETE FROM livreurs WHERE id = $1 RETURNING id', [req.params.id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Livreur introuvable.' });
+    }
+    res.status(200).json({ message: 'Livreur supprimé.' });
+  } catch (err) {
+    console.error('Erreur suppression livreur:', err.message);
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// Livreurs disponibles (public — pour le checkout)
+app.get('/api/livreurs/disponibles', async (req, res) => {
+  try {
+    const result = await db.query(
+      'SELECT id, nom, prenom, telephone, type_vehicule, ville FROM livreurs WHERE disponible = TRUE',
+    );
+    res.status(200).json({ livreurs: result.rows });
+  } catch (err) {
+    res.status(200).json({ livreurs: [] });  // pas bloquant si la table n'existe pas encore
+  }
+});
 const getProducts = (filter = {}) => {
   let query = 'SELECT * FROM produit';
   const conditions = [];
@@ -445,6 +549,8 @@ app.post('/api/commandes', async (req, res) => {
     res.status(201).json({
       message: 'Commande enregistrée avec succès. Facture envoyée par email.',
       commande,
+      // Liens de partage de la facture (WhatsApp / Facebook / SMS)
+      liens_facture: genererLiensFacture(commande),
     });
   } catch (err) {
     console.error('Erreur enregistrement commande:', err.message);

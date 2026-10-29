@@ -96,7 +96,6 @@ const Header = () => {
             </ul>
           </li>
 
-          <li><Link to="/admin">⚙️ Admin</Link></li>
           <li><Link to="Membre/Inscription">Inscription</Link></li>
           <li><Link to="Membre/ListeMembres">Membres</Link></li>
         </ul>
