@@ -26,6 +26,7 @@ import Partenaire from './pages/Partenaire';
 
 import { SearchProvider } from './SearchContext';
 import { CartProvider } from './CartContext';
+import { LangProvider } from './LangContext';
 import SearchResultsPage from './SearchResultsPage';
 import Panier from './pages/Panier';
 import Commande from './pages/Commande';
@@ -35,7 +36,8 @@ import DetailProduit from './pages/DetailProduit';
 
 function App() {
   return (
-    <SearchProvider> {/* Fournisseur ajouté ici */}
+    <LangProvider>
+      <SearchProvider> {/* Fournisseur ajouté ici */}
       <CartProvider>
         <div>
           <Router>
@@ -86,6 +88,7 @@ function App() {
         </div>
       </CartProvider>
     </SearchProvider>
+    </LangProvider>
   );
 }
 

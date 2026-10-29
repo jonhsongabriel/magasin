@@ -1,12 +1,14 @@
 // src/Membre/Connection.js — Connexion simple (4 champs) + Google
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLang } from '../LangContext';
 
 const API = 'http://localhost:5000';
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
 
 const Connection = () => {
   const navigate = useNavigate();
+  const { t } = useLang();
   const [form, setForm] = useState({ nom: '', email: '', telephone: '', adresse: '' });
   const [message, setMessage] = useState('');
   const [envoi, setEnvoi] = useState(false);
@@ -88,16 +90,14 @@ const Connection = () => {
     <div className="container my-5" style={{ maxWidth: 460 }}>
       <div className="card shadow">
         <div className="card-body p-4">
-          <h2 className="text-center mb-3">🔐 Connexion</h2>
-          <p className="text-muted text-center small">
-            Pas besoin de mot de passe — juste vos informations de livraison.
-          </p>
+          <h2 className="text-center mb-3">🔐 {t('connexion_titre')}</h2>
+          <p className="text-muted text-center small">{t('connexion_sous_titre')}</p>
 
           <form onSubmit={handleSubmit}>
             <input
               className="form-control mb-2"
               name="nom"
-              placeholder="Nom complet *"
+              placeholder={t('nom_complet')}
               value={form.nom}
               onChange={handleChange}
               required
@@ -106,7 +106,7 @@ const Connection = () => {
               className="form-control mb-2"
               type="email"
               name="email"
-              placeholder="Email *"
+              placeholder={t('email')}
               value={form.email}
               onChange={handleChange}
               required
@@ -114,14 +114,14 @@ const Connection = () => {
             <input
               className="form-control mb-2"
               name="telephone"
-              placeholder="Téléphone"
+              placeholder={t('telephone')}
               value={form.telephone}
               onChange={handleChange}
             />
             <input
               className="form-control mb-3"
               name="adresse"
-              placeholder="Adresse de livraison"
+              placeholder={t('adresse_livraison')}
               value={form.adresse}
               onChange={handleChange}
             />
@@ -129,22 +129,22 @@ const Connection = () => {
             {message && <div className="alert alert-info py-2">{message}</div>}
 
             <button className="btn btn-warning w-100 fw-bold mb-3" disabled={envoi}>
-              {envoi ? 'Connexion…' : 'Se connecter'}
+              {envoi ? t('connexion_encours') : t('se_connecter')}
             </button>
           </form>
 
-          <div className="text-center text-muted mb-2">— ou —</div>
+          <div className="text-center text-muted mb-2">{t('ou')}</div>
           <div id="btnGoogle" className="d-grid mb-2"></div>
           <button
             className="btn btn-outline-secondary w-100"
             onClick={initGoogle}
             type="button"
           >
-            🇬 Se connecter avec Google
+            🇬 {t('google')}
           </button>
 
           <p className="text-muted text-center mt-3 mb-0" style={{ fontSize: 13 }}>
-            Vos informations servent uniquement à la livraison et à la facture.
+            {t('note_connexion')}
           </p>
         </div>
       </div>

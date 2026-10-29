@@ -184,6 +184,41 @@ code {
   color: #ff6a00;
 }
 
+/* --- Sélecteur de langue --- */
+
+.header-lang {
+  display: flex;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.header-lang button {
+  background: #fff;
+  border: none;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.header-lang button:hover {
+  background: #fff3ea;
+  color: #ff6a00;
+}
+
+.header-lang button.active {
+  background: #ff6a00;
+  color: #fff;
+}
+
+/* --- Séparateur entre les boutons du groupe --- */
+.header-lang button + button {
+  border-left: 1px solid #eee;
+}
+
 /* ================= ALIBABA STYLE - FOOTER ================= */
 
 .site-footer {

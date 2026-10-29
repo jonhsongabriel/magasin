@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../CartContext';
+import { useLang } from '../LangContext';
 
 const API = 'http://localhost:5000';
 
@@ -9,6 +10,7 @@ const DetailProduit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { t } = useLang();
   const [produit, setProduit] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantite, setQuantite] = useState(1);
@@ -25,15 +27,15 @@ const DetailProduit = () => {
   }, [id]);
 
   if (loading) {
-    return <div className="container my-5 text-center"><p>Chargement…</p></div>;
+    return <div className="container my-5 text-center"><p>{t('chargement')}</p></div>;
   }
 
   if (!produit) {
     return (
       <div className="container my-5 text-center">
-        <h3>Produit introuvable</h3>
+        <h3>{t('introuvable')}</h3>
         <button className="btn btn-warning mt-3" onClick={() => navigate('/')}>
-          ← Retour à la boutique
+          {t('retour_boutique')}
         </button>
       </div>
     );
@@ -45,7 +47,7 @@ const DetailProduit = () => {
     <div className="container my-4">
       <nav aria-label="breadcrumb">
         <ol className="breadcrumb">
-          <li className="breadcrumb-item"><a href="/">Accueil</a></li>
+          <li className="breadcrumb-item"><a href="/">{t('accueil')}</a></li>
           <li className="breadcrumb-item active">{produit.produit_type}</li>
         </ol>
       </nav>
@@ -81,11 +83,11 @@ const DetailProduit = () => {
               <h2 className="text-warning fw-bold">
                 {Number(produit.produit_prix).toLocaleString('fr-FR')} Ar
               </h2>
-              <p className="text-muted small">📍 Fournisseur : {produit.produit_lieu}</p>
+              <p className="text-muted small">📍 {t('fournisseur')} : {produit.produit_lieu}</p>
 
               {/* --- Quantité --- */}
               <div className="d-flex align-items-center gap-2 my-3">
-                <span>Quantité :</span>
+                <span>{t('quantite')}</span>
                 <input
                   type="number"
                   min="1"
@@ -111,7 +113,7 @@ const DetailProduit = () => {
                     navigate('/commande');
                   }}
                 >
-                  🛒 Commander
+                  🛒 {t('commander')}
                 </button>
                 <button
                   className="btn btn-outline-secondary"
@@ -124,7 +126,7 @@ const DetailProduit = () => {
                     }, quantite);
                   }}
                 >
-                  ➕ Ajouter au panier
+                  ➕ {t('ajouter_panier')}
                 </button>
                 <a
                   className="btn btn-success"
@@ -134,16 +136,16 @@ const DetailProduit = () => {
                     `Bonjour, je suis intéressé par : ${produit.produit_nom} (${Number(produit.produit_prix).toLocaleString('fr-FR')} Ar)`,
                   )}`}
                 >
-                  💬 Poser une question (WhatsApp)
+                  💬 {t('poser_question')}
                 </a>
               </div>
 
               {/* --- Réassurance --- */}
               <hr />
               <div className="row text-center small text-muted mt-3">
-                <div className="col-4">🚚 Livraison<br />nationale & internationale</div>
-                <div className="col-4">💳 Paiement<br />Mobile Money · Banque · PayPal</div>
-                <div className="col-4">🧾 Facture<br />email · WhatsApp · SMS</div>
+                <div className="col-4">🚚 {t('reasseurance_livraison')}</div>
+                <div className="col-4">💳 {t('reassurance_paiement')}</div>
+                <div className="col-4">🧾 {t('reassurance_facture')}</div>
               </div>
             </div>
           </div>
