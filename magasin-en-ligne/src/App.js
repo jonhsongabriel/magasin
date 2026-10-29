@@ -31,6 +31,7 @@ import SearchResultsPage from './SearchResultsPage';
 import Panier from './pages/Panier';
 import Commande from './pages/Commande';
 import CommandeConfirmation from './pages/CommandeConfirmation';
+import Admin from './pages/Admin';
 
 function App() {
   return (
@@ -71,6 +72,9 @@ function App() {
             <Route path="/panier" element={<Panier />} />
             <Route path="/commande" element={<Commande />} />
             <Route path="/commande/confirmation" element={<CommandeConfirmation />} />
+
+            {/* Espace admin */}
+            <Route path="/admin" element={<Admin />} />
 
             {/* Résultats de recherche */}
             <Route path="/results" element={<SearchResultsPage />} />

@@ -51,6 +51,44 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });  // Middleware Multer
 
 /* ------------------------------------------------------------------ */
+/* ADMIN — authentification (mot de passe dans .env)                   */
+/* ------------------------------------------------------------------ */
+const ADMIN_MOT_DE_PASSE = process.env.ADMIN_MOT_DE_PASSE || 'admin123';
+
+// Vérifie le token JWT admin (middleware)
+function verifierAdmin(req, res, next) {
+  const auth = req.headers.authorization || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (!token) {
+    return res.status(401).json({ message: 'Accès admin refusé : connexion requise.' });
+  }
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET || 'secret-par-defaut');
+    if (payload.role !== 'admin') {
+      return res.status(403).json({ message: 'Accès réservé à l\'administrateur.' });
+    }
+    req.admin = payload;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Session admin expirée, reconnectez-vous.' });
+  }
+}
+
+// Connexion admin
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body || {};
+  if (!password || password !== ADMIN_MOT_DE_PASSE) {
+    return res.status(401).json({ message: 'Mot de passe admin incorrect.' });
+  }
+  const token = jwt.sign(
+    { role: 'admin' },
+    process.env.JWT_SECRET || 'secret-par-defaut',
+    { expiresIn: '8h' }
+  );
+  res.status(200).json({ message: 'Connexion admin réussie', token });
+});
+
+/* ------------------------------------------------------------------ */
 /* EMAIL & FACTURE (nodemailer + PDF)                                 */
 /* ------------------------------------------------------------------ */
 const transporter = nodemailer.createTransport({
@@ -93,6 +131,10 @@ function genererFacturePDF(commande) {
     doc.moveDown(1);
     doc.fontSize(14).text(`TOTAL : ${Number(commande.total).toLocaleString('fr-FR')} Ar`);
     doc.fontSize(11).text(`Mode de paiement : ${commande.mode_paiement}`);
+    doc.fontSize(11).text(
+      `Mode de livraison : ${commande.mode_livraison || 'a_prendre'}` +
+      (commande.frais_livraison ? ` (frais : ${commande.frais_livraison} Ar)` : ' (gratuit)'),
+    );
     doc.fontSize(9).text('Merci de votre confiance !');
 
     doc.end();
@@ -116,6 +158,8 @@ async function envoyerFactureEmail(commande) {
       <b style="color:green">${Number(commande.total).toLocaleString('fr-FR')} Ar</b>
       a bien été enregistrée.</p>
       <p>Mode de paiement : <b>${commande.mode_paiement}</b></p>
+      <p>Mode de livraison : <b>${commande.mode_livraison || 'a_prendre'}</b>
+      ${commande.frais_livraison ? `— frais : ${commande.frais_livraison} Ar` : '— gratuit'}</p>
       <p>Votre facture est jointe à cet email (PDF).</p>
       <p>À très bientôt chez Jonhson !</p>
     `,
@@ -204,8 +248,8 @@ app.get('/api/membres', async (req, res) => {
 /* PRODUITS                                                            */
 /* ------------------------------------------------------------------ */
 
-// Ajout d'un produit (admin)
-app.post('/api/action', upload.single('produit_image'), async (req, res) => {
+// Ajout d'un produit (admin uniquement)
+app.post('/api/action', verifierAdmin, upload.single('produit_image'), async (req, res) => {
   const { produit_nom, produit_description, produit_prix, produit_type, produit_lieu } = req.body;
   const imagePath = req.file ? req.file.path : null;
 
@@ -223,7 +267,41 @@ app.post('/api/action', upload.single('produit_image'), async (req, res) => {
   }
 });
 
-// Fonction générique pour récupérer les produits (filtres + recherche)
+// Suppression d'un produit (admin uniquement)
+app.delete('/api/action/:id', verifierAdmin, async (req, res) => {
+  try {
+    const result = await db.query('DELETE FROM produit WHERE id = $1 RETURNING id', [req.params.id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Produit introuvable.' });
+    }
+    res.status(200).json({ message: 'Produit supprimé.' });
+  } catch (err) {
+    console.error('Erreur suppression produit:', err.message);
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// Modifier le statut d'une commande (admin uniquement)
+app.patch('/api/commandes/:id/statut', verifierAdmin, async (req, res) => {
+  const { statut } = req.body || {};
+  const statutsValides = ['en_attente', 'payee', 'expediee', 'livree', 'annulee'];
+  if (!statutsValides.includes(statut)) {
+    return res.status(400).json({ message: 'Statut invalide.', statuts: statutsValides });
+  }
+  try {
+    const result = await db.query(
+      'UPDATE commandes SET statut = $1 WHERE id = $2 RETURNING id, statut',
+      [statut, req.params.id],
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Commande introuvable.' });
+    }
+    res.status(200).json({ message: 'Statut mis à jour.', commande: result.rows[0] });
+  } catch (err) {
+    console.error('Erreur maj statut:', err.message);
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
 const getProducts = (filter = {}) => {
   let query = 'SELECT * FROM produit';
   const conditions = [];
@@ -293,9 +371,26 @@ app.get('/api/action', async (req, res) => {
 /* COMMANDES & PAIEMENTS                                              */
 /* ------------------------------------------------------------------ */
 
-// Création d'une commande (checkout, tous modes de paiement)
+// Création d'une commande (checkout, tous modes de paiement et de livraison)
+const MODES_LIVRAISON = [
+  'a_prendre', 'livreur_moto', 'bicyclette', 'personne',
+  'automobile', 'navire', 'avion', 'colis_express', 'autres',
+];
+
+const FRAIS_LIVRAISON = {
+  a_prendre: 0,
+  livreur_moto: 5000,
+  bicyclette: 3000,
+  personne: 4000,
+  automobile: 10000,
+  navire: 50000,
+  avion: 80000,
+  colis_express: 25000,
+  autres: 15000,
+};
+
 app.post('/api/commandes', async (req, res) => {
-  const { client, articles, total, mode_paiement, paiement_details } = req.body || {};
+  const { client, articles, total, mode_paiement, paiement_details, mode_livraison, livraison_details } = req.body || {};
 
   if (!client || !Array.isArray(articles) || articles.length === 0 || !mode_paiement) {
     return res.status(400).json({
@@ -304,17 +399,27 @@ app.post('/api/commandes', async (req, res) => {
   }
 
   try {
+    // Validation du mode de livraison et calcul des frais
+    const livraison = mode_livraison && MODES_LIVRAISON.includes(mode_livraison)
+      ? mode_livraison
+      : 'a_prendre';
+    const frais = FRAIS_LIVRAISON[livraison] || 0;
+    const totalFinal = (Number(total) || 0) + frais;
+
     const result = await db.query(
       `INSERT INTO commandes
-        (client_json, articles_json, total, mode_paiement, paiement_details_json, statut)
-       VALUES ($1, $2, $3, $4, $5, 'en_attente')
+        (client_json, articles_json, total, mode_paiement, paiement_details_json, mode_livraison, livraison_details_json, frais_livraison, statut)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'en_attente')
        RETURNING id`,
       [
         JSON.stringify(client),
         JSON.stringify(articles),
-        Number(total) || 0,
+        totalFinal,
         mode_paiement,
         JSON.stringify(paiement_details || {}),
+        livraison,
+        JSON.stringify(livraison_details || {}),
+        frais,
       ],
     );
 
@@ -323,8 +428,11 @@ app.post('/api/commandes', async (req, res) => {
       numero: `CMD-${result.rows[0].id}`,
       client,
       articles,
-      total,
+      total: totalFinal,
+      total_articles: Number(total) || 0,
       mode_paiement,
+      mode_livraison: livraison,
+      frais_livraison: frais,
       statut: 'en_attente',
     };
 

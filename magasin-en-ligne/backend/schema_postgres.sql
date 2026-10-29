@@ -58,3 +58,19 @@ CREATE TABLE IF NOT EXISTS commandes (
 );
 
 -- Statuts possibles : en_attente, payee, expediee, livree, annulee
+
+-- --------------------------------------------------------------
+-- ADMIN — mot de passe hashé (changez ADMIN_MOT_DE_PASSE dans .env)
+-- L'admin n'a pas besoin de table : le mot de passe vient du .env
+-- et le backend signe un JWT role=admin.
+
+-- ------------------------------------------------------------
+-- LIVRAISON : ajout des colonnes dans commandes
+-- ------------------------------------------------------------
+ALTER TABLE commandes ADD COLUMN IF NOT EXISTS mode_livraison VARCHAR(50);
+ALTER TABLE commandes ADD COLUMN IF NOT EXISTS livraison_details_json JSONB;
+ALTER TABLE commandes ADD COLUMN IF NOT EXISTS frais_livraison NUMERIC(10,2) NOT NULL DEFAULT 0;
+
+-- Modes de livraison possibles :
+-- a_prendre, livreur_moto, bicyclette, personne, automobile, navire,
+-- avion, colis_express, autres

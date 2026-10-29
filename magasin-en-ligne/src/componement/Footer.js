@@ -54,10 +54,10 @@ const Footer = () => {
 
           <div>
             <h4>Mon compte</h4>
-            <Link to="Action/AjoutProduit">➕ Ajouter produit</Link>
             <Link to="Membre/Inscription">📝 S'inscrire</Link>
             <Link to="Membre/Connection">🔐 S'identifier</Link>
             <Link to="Membre/ListeMembres">👥 Liste des membres</Link>
+            <Link to="/admin">⚙️ Espace admin</Link>
           </div>
         </div>
 

@@ -80,6 +80,23 @@ const Header = () => {
           </li>
 
           <li><Link to="pages/Partenaire">Partenaire</Link></li>
+
+          <li className="header-dropdown">
+            <span className="nav-category dropdown-toggle">Livraison</span>
+            <ul className="dropdown-menu">
+              <li><Link className="dropdown-item" to="/commande">🏪 À prendre sur place</Link></li>
+              <li><Link className="dropdown-item" to="/commande">🏍️ Livreur moto</Link></li>
+              <li><Link className="dropdown-item" to="/commande">🚲 Bicyclette</Link></li>
+              <li><Link className="dropdown-item" to="/commande">🚶 Personne (à pied)</Link></li>
+              <li><Link className="dropdown-item" to="/commande">🚗 Automobile</Link></li>
+              <li><Link className="dropdown-item" to="/commande">🚢 Navire</Link></li>
+              <li><Link className="dropdown-item" to="/commande">✈️ Avion</Link></li>
+              <li><Link className="dropdown-item" to="/commande">📦 Colis express</Link></li>
+              <li><Link className="dropdown-item" to="/commande">📮 Autres moyens</Link></li>
+            </ul>
+          </li>
+
+          <li><Link to="/admin">⚙️ Admin</Link></li>
           <li><Link to="Membre/Inscription">Inscription</Link></li>
           <li><Link to="Membre/ListeMembres">Membres</Link></li>
         </ul>

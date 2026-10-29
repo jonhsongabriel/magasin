@@ -52,6 +52,19 @@ const Commande = () => {
   const { cart, total, clearCart } = useCart();
   const navigate = useNavigate();
 
+  // Modes de livraison et frais (identiques au backend)
+  const MODES_LIVRAISON = [
+    { id: 'a_prendre', label: '🏪 À prendre sur place', frais: 0, glyph: '🏪' },
+    { id: 'livreur_moto', label: '🏍️ Livreur moto', frais: 5000, glyph: '🏍️' },
+    { id: 'bicyclette', label: '🚲 Bicyclette', frais: 3000, glyph: '🚲' },
+    { id: 'personne', label: '🚶 Personne (à pied)', frais: 4000, glyph: '🚶' },
+    { id: 'automobile', label: '🚗 Automobile', frais: 10000, glyph: '🚗' },
+    { id: 'navire', label: '🚢 Navire (bateau)', frais: 50000, glyph: '🚢' },
+    { id: 'avion', label: '✈️ Avion', frais: 80000, glyph: '✈️' },
+    { id: 'colis_express', label: '📦 Colis express', frais: 25000, glyph: '📦' },
+    { id: 'autres', label: '📮 Autres moyens', frais: 15000, glyph: '📮' },
+  ];
+
   const [formData, setFormData] = useState({
     nom: '',
     prenom: '',
@@ -62,10 +75,14 @@ const Commande = () => {
   });
   const [modePaiement, setModePaiement] = useState(null);
   const [paiementDetails, setPaiementDetails] = useState({});
+  const [modeLivraison, setModeLivraison] = useState('a_prendre');
+  const [livraisonDetails, setLivraisonDetails] = useState({});
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
 
   const modeActif = MODES_PAIEMENT.find((m) => m.id === modePaiement);
+  const livraisonActive = MODES_LIVRAISON.find((m) => m.id === modeLivraison);
+  const totalFinal = total + (livraisonActive?.frais || 0);
 
   if (cart.length === 0) {
     return (
@@ -114,6 +131,8 @@ const Commande = () => {
           total,
           mode_paiement: modePaiement,
           paiement_details: paiementDetails,
+          mode_livraison: modeLivraison,
+          livraison_details: livraisonDetails,
         }),
       });
       const data = await response.json();
@@ -226,7 +245,48 @@ const Commande = () => {
 
         <div className="card mb-4 shadow-sm">
           <div className="card-header bg-light">
-            <strong>2. Mode de paiement</strong>
+            <strong>2. Mode de livraison</strong>
+          </div>
+          <div className="card-body">
+            <div className="row g-2">
+              {MODES_LIVRAISON.map((liv) => (
+                <div className="col-md-6 col-lg-4" key={liv.id}>
+                  <label
+                    className={`d-flex align-items-center gap-2 border rounded p-2 h-100 ${
+                      modeLivraison === liv.id ? 'border-success bg-success bg-opacity-10' : ''
+                    }`}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <input
+                      type="radio"
+                      name="modeLivraison"
+                      value={liv.id}
+                      checked={modeLivraison === liv.id}
+                      onChange={() => setModeLivraison(liv.id)}
+                    />
+                    <span>{liv.glyph}</span>
+                    <span className="flex-grow-1">{liv.label.replace(liv.glyph, '').trim()}</span>
+                    <span className="text-muted small">
+                      {liv.frais === 0 ? 'Gratuit' : `${liv.frais.toLocaleString('fr-FR')} Ar`}
+                    </span>
+                  </label>
+                </div>
+              ))}
+            </div>
+            {modeLivraison === 'autres' && (
+              <input
+                className="form-control mt-2"
+                placeholder="Précisez le moyen de livraison souhaité…"
+                value={livraisonDetails.precisions || ''}
+                onChange={(e) => setLivraisonDetails({ precisions: e.target.value })}
+              />
+            )}
+          </div>
+        </div>
+
+        <div className="card mb-4 shadow-sm">
+          <div className="card-header bg-light">
+            <strong>3. Mode de paiement</strong>
           </div>
           <div className="card-body">
             <div className="row g-2">
@@ -274,7 +334,7 @@ const Commande = () => {
 
         <div className="card mb-4 shadow-sm">
           <div className="card-header bg-light">
-            <strong>3. Récapitulatif</strong>
+            <strong>4. Récapitulatif</strong>
           </div>
           <div className="card-body">
             {cart.map((it) => (
@@ -289,9 +349,21 @@ const Commande = () => {
               </div>
             ))}
             <div className="d-flex justify-content-between mt-3">
+              <span>Total articles</span>
+              <span>{total.toLocaleString('fr-FR')} Ar</span>
+            </div>
+            <div className="d-flex justify-content-between">
+              <span>Livraison ({livraisonActive?.label})</span>
+              <span>
+                {(livraisonActive?.frais || 0) === 0
+                  ? 'Gratuit'
+                  : `${(livraisonActive?.frais || 0).toLocaleString('fr-FR')} Ar`}
+              </span>
+            </div>
+            <div className="d-flex justify-content-between mt-3">
               <h4 className="text-success">Total à payer</h4>
               <h4 className="text-success">
-                {total.toLocaleString('fr-FR')} Ariary
+                {totalFinal.toLocaleString('fr-FR')} Ariary
               </h4>
             </div>
           </div>
@@ -306,7 +378,7 @@ const Commande = () => {
             className="btn btn-success btn-lg"
             disabled={sending}
           >
-            {sending ? 'Envoi en cours…' : '✅ Confirmer et payer'}
+            {sending ? 'Envoi en cours…' : `✅ Confirmer et payer (${totalFinal.toLocaleString('fr-FR')} Ar)`}
           </button>
         </div>
       </form>
