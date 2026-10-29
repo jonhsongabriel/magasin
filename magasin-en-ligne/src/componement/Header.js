@@ -106,7 +106,8 @@ const Header = () => {
             </ul>
           </li>
 
-          <li><Link to="pages/Partenaire">Partenaire</Link></li>
+          <li><Link to="pages/Partenaire">{t('partenaire')}</Link></li>
+          <li><Link to="/locations">🔑 {t('location')}</Link></li>
 
           <li className="header-dropdown">
             <span className="nav-category dropdown-toggle">{t('livraison')}</span>

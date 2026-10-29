@@ -27,6 +27,8 @@ import Partenaire from './pages/Partenaire';
 import { SearchProvider } from './SearchContext';
 import { CartProvider } from './CartContext';
 import { LangProvider } from './LangContext';
+import { RentalProvider } from './RentalContext';
+import Locations from './pages/Locations';
 import SearchResultsPage from './SearchResultsPage';
 import Panier from './pages/Panier';
 import Commande from './pages/Commande';
@@ -39,6 +41,7 @@ function App() {
     <LangProvider>
       <SearchProvider> {/* Fournisseur ajouté ici */}
       <CartProvider>
+      <RentalProvider> {/* Fournisseur des locations */}
         <div>
           <Router>
             <Header />
@@ -80,12 +83,16 @@ function App() {
             {/* Fiche produit détaillée */}
             <Route path="/produit/:id" element={<DetailProduit />} />
 
+            {/* Locations */}
+            <Route path="/locations" element={<Locations />} />
+
             {/* Résultats de recherche */}
             <Route path="/results" element={<SearchResultsPage />} />
           </Routes>
           <Footer />
         </Router>
         </div>
+        </RentalProvider>
       </CartProvider>
     </SearchProvider>
     </LangProvider>
