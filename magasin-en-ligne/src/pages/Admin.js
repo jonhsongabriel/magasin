@@ -10,10 +10,11 @@ const Admin = () => {
   const [password, setPassword] = useState('');
   const [erreur, setErreur] = useState('');
   const [token, setToken] = useState('');
-  const [onglet, setOnglet] = useState('produits'); // 'produits' | 'commandes' | 'livreurs'
+  const [onglet, setOnglet] = useState('produits'); // 'produits' | 'commandes' | 'livreurs' | 'offres' | 'candidats'
   const [produits, setProduits] = useState([]);
   const [commandes, setCommandes] = useState([]);
   const [livreurs, setLivreurs] = useState([]);
+  const [candidats, setCandidats] = useState([]);
   const [message, setMessage] = useState('');
 
   // Formulaire d'ajout livreur
@@ -21,6 +22,13 @@ const Admin = () => {
     nom: '', prenom: '', telephone: '', email: '',
     type_vehicule: '', ville: '',
   });
+
+  // Formulaire d'ajout offre d'emploi
+  const [offreForm, setOffreForm] = useState({
+    titre: '', entreprise: '', categorie: '', ville: '',
+    type_contrat: '', salaire: '', description: '', contact: '',
+  });
+  const [offres, setOffres] = useState([]);
 
   // Formulaire d'ajout produit
   const [form, setForm] = useState({
@@ -47,8 +55,20 @@ const Admin = () => {
       chargerProduits();
       chargerCommandes();
       chargerLivreurs();
+      chargerOffres();
+      chargerCandidats();
     }
   }, [connecte, token]);
+
+  const chargerCandidats = async () => {
+    try {
+      const res = await fetch(`${API}/api/candidats`);
+      const data = await res.json();
+      setCandidats(data.candidats || []);
+    } catch {
+      setMessage('Impossible de charger les candidats.');
+    }
+  };
 
   const chargerProduits = async () => {
     try {
@@ -108,6 +128,82 @@ const Admin = () => {
     localStorage.removeItem('admin_token');
     setConnecte(false);
     setToken('');
+  };
+
+  // ---- Travail : offres d'emploi & candidats ----
+  const chargerOffres = async () => {
+    try {
+      const res = await fetch(`${API}/api/offres?_tous=1`);
+      const data = await res.json();
+      // La route publique ne renvoie que les actives : l'admin voit tout via la même liste
+      setOffres(data.offres || []);
+    } catch {
+      setMessage('Impossible de charger les offres.');
+    }
+  };
+
+  const ajouterOffre = async (e) => {
+    e.preventDefault();
+    setMessage('');
+    try {
+      const res = await fetch(`${API}/api/offres`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(offreForm),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMessage('✅ Offre ajoutée !');
+        setOffreForm({ titre: '', entreprise: '', categorie: '', ville: '', type_contrat: '', salaire: '', description: '', contact: '' });
+        chargerOffres();
+      } else {
+        setMessage(data.message || 'Erreur lors de l’ajout.');
+      }
+    } catch {
+      setMessage('Serveur backend injoignable.');
+    }
+  };
+
+  const basculerOffreActive = async (o) => {
+    try {
+      await fetch(`${API}/api/offres/${o.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ active: !o.active }),
+      });
+      chargerOffres();
+    } catch {
+      setMessage('Erreur lors de la mise à jour.');
+    }
+  };
+
+  const supprimerOffre = async (id) => {
+    if (!window.confirm('Supprimer cette offre ?')) return;
+    try {
+      await fetch(`${API}/api/offres/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessage('🗑️ Offre supprimée.');
+      chargerOffres();
+    } catch {
+      setMessage('Erreur lors de la suppression.');
+    }
+  };
+
+  const supprimerCandidat = async (id) => {
+    if (!window.confirm('Supprimer ce candidat / profil ?')) return;
+    try {
+      await fetch(`${API}/api/candidats/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessage('🗑️ Profil supprimé.');
+      chargerLivreurs();
+      chargerCandidats();
+    } catch {
+      setMessage('Erreur lors de la suppression.');
+    }
   };
 
   const ajouterProduit = async (e) => {
@@ -302,6 +398,22 @@ const Admin = () => {
             onClick={() => setOnglet('livreurs')}
           >
             🚚 Livreurs ({livreurs.length})
+          </button>
+        </li>
+        <li className="nav-item">
+          <button
+            className={`nav-link ${onglet === 'offres' ? 'active' : ''}`}
+            onClick={() => setOnglet('offres')}
+          >
+            💼 Offres d'emploi ({offres.length})
+          </button>
+        </li>
+        <li className="nav-item">
+          <button
+            className={`nav-link ${onglet === 'candidats' ? 'active' : ''}`}
+            onClick={() => setOnglet('candidats')}
+          >
+            👤 Candidats ({candidats.length})
           </button>
         </li>
       </ul>
@@ -596,6 +708,216 @@ const Admin = () => {
                 })}
                 {commandes.length === 0 && (
                   <tr><td colSpan={6} className="text-center text-muted py-4">Aucune commande.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      {/* ---- Onglet offres d'emploi ---- */}
+      {onglet === 'offres' && (
+        <div className="row">
+          <div className="col-lg-5 mb-4">
+            <div className="card shadow-sm">
+              <div className="card-header bg-warning bg-opacity-25">
+                <strong>➕ Publier une offre d'emploi</strong>
+              </div>
+              <div className="card-body">
+                <form onSubmit={ajouterOffre}>
+                  <input
+                    className="form-control mb-2"
+                    placeholder="Titre du poste *"
+                    value={offreForm.titre}
+                    onChange={(e) => setOffreForm({ ...offreForm, titre: e.target.value })}
+                    required
+                  />
+                  <input
+                    className="form-control mb-2"
+                    placeholder="Entreprise"
+                    value={offreForm.entreprise}
+                    onChange={(e) => setOffreForm({ ...offreForm, entreprise: e.target.value })}
+                  />
+                  <div className="row">
+                    <div className="col-6">
+                      <select
+                        className="form-select mb-2"
+                        value={offreForm.categorie}
+                        onChange={(e) => setOffreForm({ ...offreForm, categorie: e.target.value })}
+                      >
+                        <option value="">-- Catégorie --</option>
+                        <option>BTP</option>
+                        <option>Santé</option>
+                        <option>Technologie</option>
+                        <option>Commerce</option>
+                        <option>Éducation</option>
+                        <option>Transport</option>
+                        <option>Agriculture</option>
+                        <option>Autre</option>
+                      </select>
+                    </div>
+                    <div className="col-6">
+                      <select
+                        className="form-select mb-2"
+                        value={offreForm.ville}
+                        onChange={(e) => setOffreForm({ ...offreForm, ville: e.target.value })}
+                      >
+                        <option value="">-- Ville --</option>
+                        <option>Antananarivo</option>
+                        <option>Fianarantsoa</option>
+                        <option>Mahajanga</option>
+                        <option>Tamatave</option>
+                        <option>Toliara</option>
+                        <option>Antsiranana</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-6">
+                      <select
+                        className="form-select mb-2"
+                        value={offreForm.type_contrat}
+                        onChange={(e) => setOffreForm({ ...offreForm, type_contrat: e.target.value })}
+                      >
+                        <option value="">-- Contrat --</option>
+                        <option>CDI</option>
+                        <option>CDD</option>
+                        <option>Stage</option>
+                        <option>Freelance</option>
+                        <option>Journalier</option>
+                      </select>
+                    </div>
+                    <div className="col-6">
+                      <input
+                        className="form-control mb-2"
+                        placeholder="Salaire (ex : 800 000 Ar)"
+                        value={offreForm.salaire}
+                        onChange={(e) => setOffreForm({ ...offreForm, salaire: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <textarea
+                    className="form-control mb-2"
+                    rows={3}
+                    placeholder="Description du poste *"
+                    value={offreForm.description}
+                    onChange={(e) => setOffreForm({ ...offreForm, description: e.target.value })}
+                    required
+                  />
+                  <input
+                    className="form-control mb-3"
+                    placeholder="Contact (email ou téléphone)"
+                    value={offreForm.contact}
+                    onChange={(e) => setOffreForm({ ...offreForm, contact: e.target.value })}
+                  />
+                  <button className="btn btn-warning w-100 fw-bold">Publier l'offre</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-lg-7">
+            <div className="card shadow-sm">
+              <div className="card-header"><strong>💼 Offres publiées</strong></div>
+              <div className="card-body p-0">
+                <table className="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Poste</th>
+                      <th>Ville</th>
+                      <th>Contrat</th>
+                      <th>Statut</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {offres.map((o) => (
+                      <tr key={o.id}>
+                        <td>
+                          <strong>{o.titre}</strong><br />
+                          <small className="text-muted">{o.entreprise}</small>
+                        </td>
+                        <td>{o.ville || '—'}</td>
+                        <td>{o.type_contrat || '—'}</td>
+                        <td>
+                          <button
+                            className={`btn btn-sm ${o.active ? 'btn-success' : 'btn-secondary'}`}
+                            onClick={() => basculerOffreActive(o)}
+                          >
+                            {o.active ? 'Visible' : 'Masquée'}
+                          </button>
+                        </td>
+                        <td>
+                          <button
+                            className="btn btn-outline-danger btn-sm"
+                            onClick={() => supprimerOffre(o.id)}
+                          >
+                            ✕
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {offres.length === 0 && (
+                      <tr><td colSpan={5} className="text-center text-muted py-4">Aucune offre publiée.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ---- Onglet candidats ---- */}
+      {onglet === 'candidats' && (
+        <div className="card shadow-sm">
+          <div className="card-header"><strong>👤 Profils des chercheurs d'emploi</strong></div>
+          <div className="card-body p-0">
+            <table className="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Domaine</th>
+                  <th>Ville</th>
+                  <th>Contact</th>
+                  <th>CV</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {candidats.map((c) => (
+                  <tr key={c.id}>
+                    <td>
+                      <strong>{c.prenom ? `${c.prenom} ${c.nom}` : c.nom}</strong><br />
+                      <small className="text-muted">{c.disponibilite}</small>
+                    </td>
+                    <td>{c.domaine || '—'}</td>
+                    <td>{c.ville || '—'}</td>
+                    <td>
+                      {c.telephone && <div>📞 {c.telephone}</div>}
+                      {c.email && <small className="text-muted">✉️ {c.email}</small>}
+                    </td>
+                    <td>
+                      {c.cv_nom ? (
+                        <a
+                          className="btn btn-outline-success btn-sm"
+                          href={`${API}/api/candidats/cv/${c.cv_nom}`}
+                        >
+                          📥 CV
+                        </a>
+                      ) : '—'}
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => supprimerCandidat(c.id)}
+                      >
+                        ✕
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {candidats.length === 0 && (
+                  <tr><td colSpan={6} className="text-center text-muted py-4">Aucun candidat.</td></tr>
                 )}
               </tbody>
             </table>

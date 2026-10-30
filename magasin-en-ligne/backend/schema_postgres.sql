@@ -89,3 +89,44 @@ CREATE TABLE IF NOT EXISTS livreurs (
   disponible    BOOLEAN NOT NULL DEFAULT TRUE,
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ------------------------------------------------------------
+-- TRAVAIL : offres d'emploi (publiées par l'admin uniquement)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS offres_emploi (
+  id            SERIAL PRIMARY KEY,
+  titre         VARCHAR(255) NOT NULL,
+  entreprise    VARCHAR(255),
+  categorie     VARCHAR(100),          -- ex: BTP, Santé, Tech, Commerce...
+  ville         VARCHAR(100),
+  type_contrat  VARCHAR(50),           -- CDI, CDD, Stage, Freelance, Journalier
+  salaire       VARCHAR(100),
+  description   TEXT,
+  contact       VARCHAR(255),          -- email / téléphone de candidature
+  active        BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_offres_ville ON offres_emploi(ville);
+CREATE INDEX IF NOT EXISTS idx_offres_categorie ON offres_emploi(categorie);
+
+-- ------------------------------------------------------------
+-- TRAVAIL : candidats (personnes qui cherchent un emploi,
+-- profil + CV déposé par l'admin pour la personne)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS candidats (
+  id            SERIAL PRIMARY KEY,
+  nom           VARCHAR(150) NOT NULL,
+  prenom        VARCHAR(150),
+  email         VARCHAR(255),
+  telephone     VARCHAR(50),
+  ville         VARCHAR(100),
+  domaine       VARCHAR(100),          -- domaine de compétence
+  competences   TEXT,
+  experience    TEXT,
+  formation     TEXT,
+  langues       VARCHAR(255),
+  cv_nom        VARCHAR(255),          -- nom du fichier CV uploadé
+  disponibilite VARCHAR(50),           -- immédiate, 1 mois, etc.
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

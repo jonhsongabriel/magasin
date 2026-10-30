@@ -725,6 +725,161 @@ app.get('/api/commandes/:id', async (req, res) => {
   }
 });
 
+// ============================================================
+// TRAVAIL — Offres d'emploi & Candidats
+// Lecture publique ; création/modification/suppression = admin
+// ============================================================
+
+// ---- Offres d'emploi ----
+
+// Liste des offres (public, seulement les actives)
+app.get('/api/offres', async (req, res) => {
+  try {
+    const { ville, categorie, search } = req.query;
+    let sql = 'SELECT * FROM offres_emploi WHERE active = TRUE';
+    const params = [];
+    if (ville) { params.push(ville); sql += ` AND ville = $${params.length}`; }
+    if (categorie) { params.push(categorie); sql += ` AND categorie = $${params.length}`; }
+    if (search) {
+      params.push(`%${search}%`);
+      sql += ` AND (titre ILIKE $${params.length} OR description ILIKE $${params.length} OR entreprise ILIKE $${params.length})`;
+    }
+    sql += ' ORDER BY created_at DESC';
+    const result = await db.query(sql, params);
+    res.status(200).json({ offres: result.rows });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// Ajouter une offre (admin)
+app.post('/api/offres', verifierAdmin, async (req, res) => {
+  const { titre, entreprise, categorie, ville, type_contrat, salaire, description, contact } = req.body || {};
+  if (!titre) return res.status(400).json({ message: 'Le titre est obligatoire.' });
+  try {
+    const result = await db.query(
+      `INSERT INTO offres_emploi (titre, entreprise, categorie, ville, type_contrat, salaire, description, contact)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
+      [titre, entreprise || null, categorie || null, ville || null, type_contrat || null, salaire || null, description || null, contact || null],
+    );
+    res.status(201).json({ message: 'Offre ajoutée.', offre: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// Modifier une offre (admin)
+app.patch('/api/offres/:id', verifierAdmin, async (req, res) => {
+  const champs = ['titre', 'entreprise', 'categorie', 'ville', 'type_contrat', 'salaire', 'description', 'contact', 'active'];
+  const updates = [];
+  const params = [];
+  champs.forEach((c) => {
+    if (req.body && req.body[c] !== undefined) {
+      params.push(req.body[c]);
+      updates.push(`${c} = $${params.length}`);
+    }
+  });
+  if (updates.length === 0) return res.status(400).json({ message: 'Aucune donnée à modifier.' });
+  params.push(req.params.id);
+  try {
+    await db.query(`UPDATE offres_emploi SET ${updates.join(', ')} WHERE id = $${params.length}`, params);
+    res.status(200).json({ message: 'Offre mise à jour.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// Supprimer une offre (admin)
+app.delete('/api/offres/:id', verifierAdmin, async (req, res) => {
+  try {
+    await db.query('DELETE FROM offres_emploi WHERE id = $1', [req.params.id]);
+    res.status(200).json({ message: 'Offre supprimée.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// ---- Candidats (chercheurs d'emploi) ----
+
+// Liste des candidats (public — profils visibles par tous)
+app.get('/api/candidats', async (req, res) => {
+  try {
+    const { ville, domaine, search } = req.query;
+    let sql = 'SELECT * FROM candidats WHERE TRUE';
+    const params = [];
+    if (ville) { params.push(ville); sql += ` AND ville = $${params.length}`; }
+    if (domaine) { params.push(domaine); sql += ` AND domaine = $${params.length}`; }
+    if (search) {
+      params.push(`%${search}%`);
+      sql += ` AND (nom ILIKE $${params.length} OR competences ILIKE $${params.length} OR domaine ILIKE $${params.length})`;
+    }
+    sql += ' ORDER BY created_at DESC';
+    const result = await db.query(sql, params);
+    res.status(200).json({ candidats: result.rows });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// Déposer un profil / CV (public — toute personne peut postuler son profil)
+app.post('/api/candidats', upload.single('cv'), async (req, res) => {
+  const { nom, prenom, email, telephone, ville, domaine, competences, experience, formation, langues, disponibilite } = req.body || {};
+  if (!nom) return res.status(400).json({ message: 'Le nom est obligatoire.' });
+  try {
+    const result = await db.query(
+      `INSERT INTO candidats (nom, prenom, email, telephone, ville, domaine, competences, experience, formation, langues, cv_nom, disponibilite)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
+      [
+        nom, prenom || null, email || null, telephone || null, ville || null, domaine || null,
+        competences || null, experience || null, formation || null, langues || null,
+        req.file ? req.file.filename : null, disponibilite || null,
+      ],
+    );
+    res.status(201).json({ message: 'Profil enregistré.', candidat: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// Télécharger un CV
+app.get('/api/candidats/cv/:fichier', (req, res) => {
+  const fichier = path.basename(req.params.fichier); // sécurité : pas de traversal
+  const chemin = path.join(__dirname, 'uploads', fichier);
+  if (fs.existsSync(chemin)) return res.download(chemin);
+  res.status(404).json({ message: 'CV introuvable.' });
+});
+
+// Modifier un candidat (admin)
+app.patch('/api/candidats/:id', verifierAdmin, async (req, res) => {
+  const champs = ['nom', 'prenom', 'email', 'telephone', 'ville', 'domaine', 'competences', 'experience', 'formation', 'langues', 'disponibilite'];
+  const updates = [];
+  const params = [];
+  champs.forEach((c) => {
+    if (req.body && req.body[c] !== undefined) {
+      params.push(req.body[c]);
+      updates.push(`${c} = $${params.length}`);
+    }
+  });
+  if (updates.length === 0) return res.status(400).json({ message: 'Aucune donnée à modifier.' });
+  params.push(req.params.id);
+  try {
+    await db.query(`UPDATE candidats SET ${updates.join(', ')} WHERE id = $${params.length}`, params);
+    res.status(200).json({ message: 'Candidat mis à jour.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// Supprimer un candidat (admin)
+app.delete('/api/candidats/:id', verifierAdmin, async (req, res) => {
+  try {
+    await db.query('DELETE FROM candidats WHERE id = $1', [req.params.id]);
+    res.status(200).json({ message: 'Candidat supprimé.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
 // Lancer le serveur
 app.listen(port, () => {
   console.log(`Serveur backend en cours d'exécution sur http://localhost:${port}`);

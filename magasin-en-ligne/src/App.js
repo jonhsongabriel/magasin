@@ -29,6 +29,8 @@ import { CartProvider } from './CartContext';
 import { LangProvider } from './LangContext';
 import { RentalProvider } from './RentalContext';
 import Locations from './pages/Locations';
+import OffresEmploi from './pages/OffresEmploi';
+import ChercherEmploi from './pages/ChercherEmploi';
 import SearchResultsPage from './SearchResultsPage';
 import Panier from './pages/Panier';
 import Commande from './pages/Commande';
@@ -85,6 +87,10 @@ function App() {
 
             {/* Locations */}
             <Route path="/locations" element={<Locations />} />
+
+            {/* Travail : offres d'emploi & chercheurs d'emploi */}
+            <Route path="/travail/offres" element={<OffresEmploi />} />
+            <Route path="/travail/chercher" element={<ChercherEmploi />} />
 
             {/* Résultats de recherche */}
             <Route path="/results" element={<SearchResultsPage />} />

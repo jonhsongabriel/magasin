@@ -110,6 +110,14 @@ const Header = () => {
           <li><Link to="/locations">🔑 {t('location')}</Link></li>
 
           <li className="header-dropdown">
+            <span className="nav-category dropdown-toggle">💼 {t('travail')}</span>
+            <ul className="dropdown-menu">
+              <li><Link className="dropdown-item" to="/travail/offres">📋 {t('offres_emploi')}</Link></li>
+              <li><Link className="dropdown-item" to="/travail/chercher">👤 {t('chercher_emploi')}</Link></li>
+            </ul>
+          </li>
+
+          <li className="header-dropdown">
             <span className="nav-category dropdown-toggle">{t('livraison')}</span>
             <ul className="dropdown-menu">
               <li><Link className="dropdown-item" to="/commande">{t('a_prendre')}</Link></li>

@@ -293,3 +293,49 @@ code {
 .footer-bottom strong {
   color: #ff6a00;
 }
+/* ============ TRAVAIL — Offres d'emploi & Chercher emploi ============ */
+
+.offre-card,
+.candidat-card {
+  border-radius: 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.offre-card:hover,
+.candidat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Modale détails (offre ou profil) */
+.offre-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 1rem;
+}
+.offre-modal {
+  max-width: 560px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 12px;
+}
+
+/* Avatar rond des candidats */
+.candidat-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff9900, #ff6600);
+  color: #fff;
+  font-weight: 700;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
