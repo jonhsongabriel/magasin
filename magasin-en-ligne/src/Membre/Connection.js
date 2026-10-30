@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '../LangContext';
 
-const API = 'http://localhost:5000';
+const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
 
 const Connection = () => {
@@ -153,3 +153,4 @@ const Connection = () => {
 };
 
 export default Connection;
+

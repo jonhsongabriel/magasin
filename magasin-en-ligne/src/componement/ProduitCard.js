@@ -65,3 +65,4 @@ const ProduitCard = ({ produit }) => {
 };
 
 export default ProduitCard;
+

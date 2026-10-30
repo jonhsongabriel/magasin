@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProduitCard from '../componement/ProduitCard';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const Mode = () => {
   const [produits, setProduits] = useState([]);
@@ -9,7 +10,7 @@ const Mode = () => {
   useEffect(() => {
     // RÃ©cupÃ©ration des produits pour Mode
     axios
-      .get('http://localhost:5000/api/produits?type=Mode')
+      .get(API_URL + '/api/produits?type=Mode')
       .then((response) => {
         setProduits(response.data.produits);
         setLoading(false);
@@ -41,3 +42,5 @@ const Mode = () => {
 };
 
 export default Mode;
+
+

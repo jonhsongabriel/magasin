@@ -24,14 +24,22 @@ app.use('/uploads', express.static('uploads'));
 /* ------------------------------------------------------------------ */
 /* BASE DE DONNÉES : PostgreSQL local (base "magasin", indépendante)   */
 /* ------------------------------------------------------------------ */
-const db = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: Number(process.env.DB_PORT) || 5432,
-  user: process.env.DB_USER || 'postgres',
-  password: String(process.env.DB_PASSWORD ?? ''),
-  database: process.env.DB_NAME || 'magasin',
-  max: 10,
-});
+const db = new Pool(
+  process.env.DATABASE_URL
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false },  // requis pour les hébergeurs (Render, Neon, etc.)
+        max: 10,
+      }
+    : {
+        host: process.env.DB_HOST || 'localhost',
+        port: Number(process.env.DB_PORT) || 5432,
+        user: process.env.DB_USER || 'postgres',
+        password: String(process.env.DB_PASSWORD ?? ''),
+        database: process.env.DB_NAME || 'magasin',
+        max: 10,
+      }
+);
 
 // Test de connexion au démarrage
 db.query('SELECT 1')
@@ -881,6 +889,7 @@ app.delete('/api/candidats/:id', verifierAdmin, async (req, res) => {
 });
 
 // Lancer le serveur
-app.listen(port, () => {
-  console.log(`Serveur backend en cours d'exécution sur http://localhost:${port}`);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Serveur backend en cours d'exécution sur le port ${PORT}`);
 });

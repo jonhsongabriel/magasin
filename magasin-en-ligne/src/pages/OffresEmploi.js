@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLang } from '../LangContext';
 
-const API = 'http://localhost:5000';
+const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const CATEGORIES = ['BTP', 'Santé', 'Technologie', 'Commerce', 'Éducation', 'Transport', 'Agriculture', 'Autre'];
 const VILLES = ['Antananarivo', 'Fianarantsoa', 'Mahajanga', 'Tamatave', 'Toliara', 'Antsiranana'];
@@ -173,3 +173,4 @@ const OffresEmploi = () => {
 };
 
 export default OffresEmploi;
+

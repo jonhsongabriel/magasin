@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProduitCard from '../componement/ProduitCard';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const Exportation = () => {
   const [produits, setProduits] = useState([]);
@@ -9,7 +10,7 @@ const Exportation = () => {
   useEffect(() => {
     // RÃ©cupÃ©ration des produits pour Exportation
     axios
-      .get('http://localhost:5000/api/produits?type=Exportation')
+      .get(API_URL + '/api/produits?type=Exportation')
       .then((response) => {
         setProduits(response.data.produits);
         setLoading(false);
@@ -41,3 +42,5 @@ const Exportation = () => {
 };
 
 export default Exportation;
+
+

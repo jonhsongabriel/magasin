@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useCart } from '../CartContext';
 import jonhsonLogo from '../assets/jonhson-magasin.jpg';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const MODES_PAIEMENT = [
   { value: 'mvola', label: '📱 MVola (Telma)' },
@@ -73,7 +74,7 @@ const Panier = () => {
 
     setEnvoi(true);
     try {
-      const response = await fetch('http://localhost:5000/api/commandes', {
+      const response = await fetch(API_URL + '/api/commandes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -291,3 +292,5 @@ const Panier = () => {
 };
 
 export default Panier;
+
+

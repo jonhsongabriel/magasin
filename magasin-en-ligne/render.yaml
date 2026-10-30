@@ -1,0 +1,33 @@
+{
+  "services": [
+    {
+      "type": "web",
+      "name": "magasin-backend",
+      "runtime": "node",
+      "rootDir": "magasin-en-ligne/backend",
+      "buildCommand": "npm install",
+      "startCommand": "node server.js",
+      "plan": "free",
+      "healthCheckPath": "/api/produits"
+    },
+    {
+      "type": "web",
+      "name": "magasin-frontend",
+      "runtime": "static",
+      "rootDir": "magasin-en-ligne",
+      "buildCommand": "npm install && npm run build",
+      "staticPublishPath": "build",
+      "pullRequestPreviewsEnabled": "no",
+      "routes": [
+        { "type": "rewrite", "source": "/(.*)", "destination": "/index.html" }
+      ]
+    }
+  ],
+  "databases": [
+    {
+      "name": "magasin-db",
+      "databaseName": "magasin",
+      "plan": "free"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function AjoutProduit() {
   const [formData, setFormData] = useState({
@@ -35,7 +36,7 @@ function AjoutProduit() {
     console.log('Données envoyées :', Object.fromEntries(ajoutProduit.entries()));
 
     try {
-      const response = await fetch('http://localhost:5000/api/action', {
+      const response = await fetch(API_URL + '/api/action', {
         method: 'POST',
         body: ajoutProduit,
       });
@@ -189,3 +190,5 @@ function AjoutProduit() {
 }
 
 export default AjoutProduit;
+
+

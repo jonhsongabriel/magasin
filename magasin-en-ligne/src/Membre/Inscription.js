@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function Inscription() {
   const [formData, setFormData] = useState({
@@ -40,7 +41,7 @@ const handleSubmit = async (e) => {
   console.log("Données envoyées : ", Object.fromEntries(formDataToSend.entries())); // Ajout du log pour vérifier
 
   try {
-    const response = await fetch('http://localhost:5000/api/inscription', {
+    const response = await fetch(API_URL + '/api/inscription', {
       method: 'POST',
       body: formDataToSend
     });
@@ -114,3 +115,5 @@ const handleSubmit = async (e) => {
 }
 
 export default Inscription;
+
+

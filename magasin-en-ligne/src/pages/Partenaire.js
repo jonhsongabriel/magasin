@@ -117,3 +117,4 @@ const Partenaire = () => {
 };
 
 export default Partenaire;
+

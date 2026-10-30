@@ -45,3 +45,4 @@ export const useRentals = () => {
 };
 
 export default RentalContext;
+

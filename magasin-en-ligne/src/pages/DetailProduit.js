@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../CartContext';
 import { useLang } from '../LangContext';
 
-const API = 'http://localhost:5000';
+const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const DetailProduit = () => {
   const { id } = useParams();
@@ -156,3 +156,4 @@ const DetailProduit = () => {
 };
 
 export default DetailProduit;
+

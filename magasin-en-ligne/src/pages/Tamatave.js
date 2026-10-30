@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProduitCard from '../componement/ProduitCard';
 import { Link } from 'react-router-dom';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const Tamatave = () => {
   const [produits, setProduits] = useState([]);
@@ -10,7 +11,7 @@ const Tamatave = () => {
   useEffect(() => {
     // RÃ©cupÃ©ration des produits pour Antsiranana
     axios
-      .get('http://localhost:5000/api/produits?lieu=Tamatave')
+      .get(API_URL + '/api/produits?lieu=Tamatave')
       .then((response) => {
         setProduits(response.data.produits);
         setLoading(false);
@@ -47,3 +48,5 @@ const Tamatave = () => {
 };
 
 export default Tamatave;
+
+

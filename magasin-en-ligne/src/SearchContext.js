@@ -13,7 +13,7 @@ export const SearchProvider = ({ children }) => {
     }
     try {
       const res = await fetch(
-        `http://localhost:5000/api/produits?search=${encodeURIComponent(query)}`,
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/produits?search=${encodeURIComponent(query)}`,
       );
       const data = await res.json();
       setSearchResults(data.produits || []);
@@ -29,3 +29,4 @@ export const SearchProvider = ({ children }) => {
     </SearchContext.Provider>
   );
 };
+

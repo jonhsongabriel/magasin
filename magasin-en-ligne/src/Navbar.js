@@ -5,3 +5,4 @@ const onSubmit = (e) => {
   handleSearch(localSearch);
   navigate('/results'); // Redirige vers la page des résultats
 };
+

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../CartContext';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const MODES_PAIEMENT = [
   {
@@ -122,7 +123,7 @@ const Commande = () => {
 
     setSending(true);
     try {
-      const response = await fetch('http://localhost:5000/api/commandes', {
+      const response = await fetch(API_URL + '/api/commandes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -389,3 +390,5 @@ const Commande = () => {
 };
 
 export default Commande;
+
+

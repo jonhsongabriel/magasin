@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const Accueil = () => {
   const [produits, setProduits] = useState([]);
@@ -8,7 +9,7 @@ const Accueil = () => {
   useEffect(() => {
     // Récupération des produits pour Antsiranana
     axios
-      .get('http://localhost:5000/api/produits')
+      .get(API_URL + '/api/produits')
       .then((response) => {
         setProduits(response.data.produits);
         setLoading(false);
@@ -89,3 +90,5 @@ const Accueil = () => {
 };
 
 export default Accueil;
+
+
