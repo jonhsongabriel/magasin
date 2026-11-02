@@ -30,3 +30,7 @@ npm start
 ```
 
 Le frontend tourne sur http://localhost:3000 et l'API sur http://localhost:5000.
+
+## Déploiement
+
+Pour déployer gratuitement (Neon + Render), voir [DEPLOIEMENT.md](magasin-en-ligne/DEPLOIEMENT.md).

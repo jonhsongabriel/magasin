@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ProduitCard from './componement/ProduitCard';
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const Accueil = () => {
@@ -65,24 +66,7 @@ const Accueil = () => {
       <h1 className="text-center">Produits disponibles Maintenant</h1>
       <div className="row">
         {produits.map((produit) => (
-          <div key={produit.id} className="col-md-4 mb-2">
-            <div className="card">
-              {produit.produit_image && (
-                <img
-                  src={produit.produit_image}
-                  className="card-img-top"
-                  alt={produit.produit_nom}
-                  style={{width:'16 em',height:'12em'}}
-                />
-              )}
-              <div className="card-body bg-success text-white">
-                <h5 className="card-title">{produit.produit_nom}</h5>
-                <p className="card-text">Type: {produit.produit_type}</p>
-                <p className="card-text">Prix: {produit.produit_prix} Ariary</p>
-                <p className="card-text">Fournisseur: {produit.produit_lieu}</p>
-              </div>
-            </div>
-          </div>
+          <ProduitCard key={produit.id} produit={produit} />
         ))}
       </div>
     </div>
